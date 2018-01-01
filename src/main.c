@@ -156,12 +156,12 @@ int main(int argc, char* argv[]) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     /* Set vertex attributes */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);  // associate triangle array buffer object data with attribute 0
+    glEnableVertexAttribArray(0);  // inform the shader it can now use vertex attribute 0
+    glBindBuffer(GL_ARRAY_BUFFER, 0);  // attribute 0 is now stored in the vector array object, we can safely unbind
 
     /* Unbind objects */
-    glBindVertexArray(0);  // Unbind first so that we don't affect the vertex array with the following unbinds
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
+    glBindVertexArray(0);  // Unbind the vertex array first so that we don't de-associate the element array when we unbind it next
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
 
     /* Draw in wireframe mode */
