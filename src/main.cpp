@@ -28,6 +28,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "graphics/stb_image.h"
+
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
@@ -50,8 +53,9 @@ const char* vertex_shader2_source =
     "out vec4 vertex_color;\n"
     "\n"
     "void main() {\n"
-    "    gl_Position = vec4(pos.x + x_offset, pos.y + y_offset, pos.z, 1.0);\n"
-    "    vertex_color = vec4(col, 1.0f);\n"
+    "    gl_Position = vec4(pos.x + x_offset, pos.y + y_offset, pos.z, 1.0f);\n"
+    "    //vertex_color = vec4(col, 1.0f);\n"
+    "    vertex_color = vec4(col, 1.0f) + gl_Position;\n"
     "}\n";
 
 const char* fragment_shader1_source =
@@ -84,62 +88,6 @@ void process_input(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
-}
-
-/**
- * Creates a shader program from the src of a vertex shader and fragment shader.
- */
-GLuint create_shader_program(const char* vertex_shader_src, const char* fragment_shader_src) {
-    GLuint vertex_shader, fragment_shader, shader_program;
-    int success;
-    char infolog[512];
-
-    /* Create vertex shader */
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_src, NULL);
-    glCompileShader(vertex_shader);
-    glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vertex_shader, sizeof(infolog), NULL, infolog);
-        glDeleteShader(vertex_shader);
-        printf("Failed to compile vertex shader: \"%s\"\n", infolog);
-        return 0;
-    }
-    printf("Vertex shader compiled.\n");
-
-    /* Create fragment shader */
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_src, NULL);
-    glCompileShader(fragment_shader);
-    glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fragment_shader, sizeof(infolog), NULL, infolog);
-        glDeleteShader(fragment_shader);
-        printf("Failed to compile fragment shader: \"%s\"\n", infolog);
-        return 0;
-    }
-    printf("Fragment shader compiled.\n");
-
-    /* Create shader program */
-    shader_program = glCreateProgram();
-    glAttachShader(shader_program, vertex_shader);
-    glAttachShader(shader_program, fragment_shader);
-    glLinkProgram(shader_program);
-    glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shader_program, sizeof(infolog), NULL, infolog);
-        glDeleteShader(fragment_shader);
-        glDeleteShader(vertex_shader);
-        printf("Failed to link shader program: \"%s\"\n", infolog);
-        return 0;
-    }
-    printf("Shader program linked.\n");
-
-    /* Clean up shaders and tell opengl to use the shader program we just made */
-    glDeleteShader(fragment_shader);
-    glDeleteShader(vertex_shader);
-
-    return shader_program;
 }
 
 /**
@@ -270,16 +218,12 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    unsigned int indices[] = {
-        0, 1, 2,
-    };
-
     float vertices1[] = {
         0.0f, 0.5f, 0.0f,  // t1 top right
         0.5f, 0.0f, 0.0f,  // t1 bottom right
        -0.5f, 0.0f, 0.0f,  // t1 bottom left
     };
-    GLuint triangle1 = create_vao_from_vertices(shader1, vertices1, sizeof(vertices1), indices, sizeof(indices));
+    GLuint triangle1 = create_texture_vao_from_vertices(shader1, vertices1, sizeof(vertices1), "container.jpg");
     if (triangle1 == 0) {
         printf("Failed to create vao1, exiting...\n");
         return 1;
