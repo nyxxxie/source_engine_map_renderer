@@ -24,6 +24,7 @@
  */
 
 #include <stdio.h>
+#include <math.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -44,10 +45,12 @@ const char* vertex_shader2_source =
     "#version 330 core\n"
     "in vec3 pos;\n"
     "in vec3 col;\n"
-    "out vec4 vertex_color;"
+    "uniform float x_offset;\n"
+    "uniform float y_offset;\n"
+    "out vec4 vertex_color;\n"
     "\n"
     "void main() {\n"
-    "    gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);\n"
+    "    gl_Position = vec4(pos.x + x_offset, pos.y + y_offset, pos.z, 1.0);\n"
     "    vertex_color = vec4(col, 1.0f);\n"
     "}\n";
 
@@ -144,7 +147,8 @@ GLuint create_shader_program(const char* vertex_shader_src, const char* fragment
  * This vector array object can be bound and rendered with glDrawElements.
  */
 GLuint create_color_vao_from_vertices(GLuint shader_program, float vertices[], size_t vertices_size) {
-    GLuint vbo, evbo, vao, attrib_pos, attrib_col;
+    GLuint vbo, evbo, vao;
+    GLint attrib_pos, attrib_col;
     /* Create objects */
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -188,7 +192,8 @@ GLuint create_color_vao_from_vertices(GLuint shader_program, float vertices[], s
 GLuint create_vao_from_vertices(GLuint shader_program,
                                 float vertices[], size_t vertices_size,
                                 unsigned int indices[], size_t indices_size) {
-    GLuint vbo, evbo, vao, attrib_pos;
+    GLuint vbo, evbo, vao;
+    GLint attrib_pos;
     /* Create objects */
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -304,13 +309,15 @@ int main(int argc, char* argv[]) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        /* Render triangle1 */
+        ///* Render triangle1 */
         glUseProgram(shader1);
         glBindVertexArray(triangle1);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 
         /* Render triangle2 */
         glUseProgram(shader2);
+        glUniform1f(glGetUniformLocation(shader2, "y_offset"), (sin(glfwGetTime() * 2) / 2.0f) + 0.3f);
+        glUniform1f(glGetUniformLocation(shader2, "x_offset"), (sin(glfwGetTime() * 5) / 2.0f));
         glBindVertexArray(triangle2);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
