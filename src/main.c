@@ -30,19 +30,40 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
-const char* vertex_shader_source =
+const char* vertex_shader1_source =
     "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
+    "in vec3 pos;\n"
+    "out vec4 vertex_color;"
     "\n"
     "void main() {\n"
-    "    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "    gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);\n"
+    "    vertex_color = vec4(0.0f, 1.0f, 0.5f, 1.0f);\n"
     "}\n";
 
-const char* fragment_shader_source =
+const char* vertex_shader2_source =
+    "#version 330 core\n"
+    "in vec3 pos;\n"
+    "in vec3 col;\n"
+    "out vec4 vertex_color;"
+    "\n"
+    "void main() {\n"
+    "    gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);\n"
+    "    vertex_color = vec4(col, 1.0f);\n"
+    "}\n";
+
+const char* fragment_shader1_source =
     "#version 330 core\n"
     "out vec4 FragColor;\n"
     "void main() {\n"
     "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "}\n" ;
+
+const char* fragment_shader2_source =
+    "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "in vec4 vertex_color;"
+    "void main() {\n"
+    "    FragColor = vertex_color;\n"
     "}\n" ;
 
 
@@ -122,9 +143,52 @@ GLuint create_shader_program(const char* vertex_shader_src, const char* fragment
  * Given a list of verticies and indices, creates a vector array object.
  * This vector array object can be bound and rendered with glDrawElements.
  */
-GLuint create_vao_from_vertices(float vertices[], size_t vertices_size,
-                                 unsigned int indices[], size_t indices_size) {
-    GLuint vbo, evbo, vao;
+GLuint create_color_vao_from_vertices(GLuint shader_program, float vertices[], size_t vertices_size) {
+    GLuint vbo, evbo, vao, attrib_pos, attrib_col;
+    /* Create objects */
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &evbo);
+    glBindVertexArray(vao);  // All future binds will be associated with this vertex array
+
+    /* Copy verticies and to buffer object */
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices, GL_STATIC_DRAW);
+
+    /* Find vertex attribute */
+    attrib_pos = glGetAttribLocation(shader_program, "pos");
+    if (attrib_pos == -1) {
+        printf("Failed to find pos attribute.\n");
+        return 0;
+    }
+
+    attrib_col = glGetAttribLocation(shader_program, "col");
+    if (attrib_col == -1) {
+        printf("Failed to find col attribute.\n");
+        return 0;
+    }
+
+    /* Set vertex attributes */
+    glVertexAttribPointer(attrib_pos, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(attrib_pos);
+    glVertexAttribPointer(attrib_col, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(attrib_col);
+
+    /* Unbind objects */
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    return vao;
+}
+
+/**
+ * Given a list of verticies and indices, creates a vector array object.
+ * This vector array object can be bound and rendered with glDrawElements.
+ */
+GLuint create_vao_from_vertices(GLuint shader_program,
+                                float vertices[], size_t vertices_size,
+                                unsigned int indices[], size_t indices_size) {
+    GLuint vbo, evbo, vao, attrib_pos;
     /* Create objects */
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -139,12 +203,19 @@ GLuint create_vao_from_vertices(float vertices[], size_t vertices_size,
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, evbo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices, GL_STATIC_DRAW);
 
+    /* Find vertex attribute */
+    attrib_pos = glGetAttribLocation(shader_program, "pos");
+    if (attrib_pos == -1) {
+        printf("Failed to find pos attribute.\n");
+        return 0;
+    }
+
     /* Set vertex attributes */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);  // associate triangle array buffer object data with attribute 0
-    glEnableVertexAttribArray(0);  // inform the shader it can now use vertex attribute 0
-    glBindBuffer(GL_ARRAY_BUFFER, 0);  // attribute 0 is now stored in the vector array object, we can safely unbind
+    glVertexAttribPointer(attrib_pos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);  // associate triangle array buffer object data with attribute 0
+    glEnableVertexAttribArray(attrib_pos);  // inform the shader it can now use vertex attribute 0
 
     /* Unbind objects */
+    glBindBuffer(GL_ARRAY_BUFFER, 0);  // attribute 0 is now stored in the vector array object, we can safely unbind
     glBindVertexArray(0);  // Unbind the vertex array first so that we don't de-associate the element array when we unbind it next
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
 
@@ -182,32 +253,46 @@ int main(int argc, char* argv[]) {
     /*  Register a callback to resize the draw space when the window changes */
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    GLuint shader1 = create_shader_program(vertex_shader_source, fragment_shader_source);
+    GLuint shader1 = create_shader_program(vertex_shader1_source, fragment_shader1_source);
     if (shader1 == 0) {
-        printf("Failed to create shader program, exiting...\n");
+        printf("Failed to create shader program 1, exiting...\n");
+        return 1;
+    }
+
+    GLuint shader2 = create_shader_program(vertex_shader2_source, fragment_shader2_source);
+    if (shader2 == 0) {
+        printf("Failed to create shader program 2, exiting...\n");
         return 1;
     }
 
     unsigned int indices[] = {
-        0, 1, 3,  // first triangle
-        1, 2, 3   // second triangle
+        0, 1, 2,
     };
 
-    float vertices[] = {
-        0.5f,  0.5f, 0.0f,  // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
+    float vertices1[] = {
+        0.0f, 0.5f, 0.0f,  // t1 top right
+        0.5f, 0.0f, 0.0f,  // t1 bottom right
+       -0.5f, 0.0f, 0.0f,  // t1 bottom left
     };
-
-    GLuint triangle1 = create_vao_from_vertices(vertices, sizeof(vertices), indices, sizeof(indices));
+    GLuint triangle1 = create_vao_from_vertices(shader1, vertices1, sizeof(vertices1), indices, sizeof(indices));
     if (triangle1 == 0) {
-        printf("Failed to create vao, exiting...\n");
+        printf("Failed to create vao1, exiting...\n");
+        return 1;
+    }
+
+    float vertices2[] = {
+        0.0f, -0.6f, 0.0f, 0.0f, 0.0f, 1.0f,  // t1 top right
+        0.5f, -0.1f, 0.0f, 0.0f, 1.0f, 0.0f,  // t1 bottom right
+       -0.5f, -0.1f, 0.0f, 1.0f, 0.0f, 0.0f,  // t1 bottom left
+    };
+    GLuint triangle2 = create_color_vao_from_vertices(shader2, vertices2, sizeof(vertices2));
+    if (triangle1 == 0) {
+        printf("Failed to create vao2, exiting...\n");
         return 1;
     }
 
     /* Draw in wireframe mode */
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     /* Start render loop! */
     printf("Rendering started.\n");
@@ -219,10 +304,15 @@ int main(int argc, char* argv[]) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        /* Render triangle */
+        /* Render triangle1 */
         glUseProgram(shader1);
         glBindVertexArray(triangle1);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+
+        /* Render triangle2 */
+        glUseProgram(shader2);
+        glBindVertexArray(triangle2);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         /* Check and call events and swap the buffers */
         glfwPollEvents();
