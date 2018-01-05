@@ -26,7 +26,6 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <iostream>
 #include "shader.h"
 
 
@@ -49,9 +48,6 @@ Shader::Shader(const std::string& vertex_shader_path,
     vertex_shader_file.close();
 
     /* Compile vertex shader */
-    std::cout << "---------------------------" << std::endl;
-    std::cout << vertex_shader_src << std::endl;
-    std::cout << "---------------------------" << std::endl;
     vertex_shader = CreateShaderFromString(vertex_shader_src.c_str(),
 		    			   GL_VERTEX_SHADER,
 					   infolog, sizeof(infolog));
@@ -72,9 +68,6 @@ Shader::Shader(const std::string& vertex_shader_path,
     fragment_shader_file.close();
 
     /* Fragment vertex shader */
-    std::cout << "---------------------------" << std::endl;
-    std::cout << fragment_shader_src << std::endl;
-    std::cout << "---------------------------" << std::endl;
     fragment_shader = CreateShaderFromString(fragment_shader_src.c_str(),
 		    			     GL_FRAGMENT_SHADER,
                                              infolog, sizeof(infolog));
