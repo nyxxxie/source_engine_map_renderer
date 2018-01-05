@@ -47,6 +47,16 @@ Vertex::Vertex(const glm::vec3& position, const glm::vec3& color) {
 Vertex::Vertex(const glm::vec3& position, const glm::vec2& texture_coords) {
     this->position = position;
     this->texture_coords = texture_coords;
+    printf("%f\n", this->texture_coords.x);
+    this->has_color = false;
+    this->has_texture_coords = true;
+    this->has_normal = false;
+}
+
+Vertex::Vertex(const glm::vec3& position, const glm::vec3& color, const glm::vec2& texture_coords) {
+    this->position = position;
+    this->color = color;
+    this->texture_coords = texture_coords;
     this->has_color = false;
     this->has_texture_coords = true;
     this->has_normal = false;

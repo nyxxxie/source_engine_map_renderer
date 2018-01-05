@@ -49,14 +49,15 @@ private:
 
 class Mesh {
 public:
-    Mesh(std::initializer_list<Vertex> vertices);
+    Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint> indices = {});
 
     void Render();
 
 private:
+    bool has_indices;
     GLuint draw_count;
     GLuint vertex_array_object;
-    GLuint vertex_position_buffer;
+    GLuint vertex_data_buffer;
     GLuint vertex_index_buffer;
 };
 

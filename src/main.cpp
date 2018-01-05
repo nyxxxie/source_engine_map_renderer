@@ -84,12 +84,16 @@ int main(int argc, char* argv[]) {
     /*  Register a callback to resize the draw space when the window changes */
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    Shader shader1("./assets/shaders/reg_vertex.vshader",
-                   "./assets/shaders/reg_vertex.fshader");
+    Shader shader1("./assets/shaders/textured_vertex.vshader",
+                   "./assets/shaders/textured_vertex.fshader");
     Mesh triangle_upper({
-        Vertex(glm::vec3(-0.4f, 0.1f, 0.0f)),  // left vertex
-        Vertex(glm::vec3( 0.4f, 0.1f, 0.0f)),  // right vertex
-        Vertex(glm::vec3( 0.0f, 0.5f, 0.0f)),  // top vertex
+        Vertex(glm::vec3( 0.4f, 0.9f, 0.0f), glm::vec2(1.0f, 1.0f)),  // top right
+        Vertex(glm::vec3( 0.4f, 0.1f, 0.0f), glm::vec2(1.0f, 0.0f)),  // bottom right
+        Vertex(glm::vec3(-0.4f, 0.1f, 0.0f), glm::vec2(0.0f, 0.0f)),  // bottom left
+        Vertex(glm::vec3(-0.4f, 0.9f, 0.0f), glm::vec2(0.0f, 1.0f)),  // top left
+    }, {
+        0, 1, 3,
+	1, 2, 3
     });
 
     Shader shader2("./assets/shaders/colored_vertex.vshader",
@@ -99,6 +103,29 @@ int main(int argc, char* argv[]) {
         Vertex(glm::vec3( 0.4f, -0.1f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)),  // right vertex
         Vertex(glm::vec3( 0.0f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),  // top vertex
     });
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    /* Set texture wrapping parameters */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    /* Set texture filtering parameters */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    int width, height, channels;
+    unsigned char* data = stbi_load("./assets/textures/container.jpg", &width, &height, &channels, 0);
+    if (!data) {
+        printf("Failed to load texture\n");
+        return 1;
+    }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
 
     /* Draw in wireframe mode */
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -114,8 +141,11 @@ int main(int argc, char* argv[]) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         /* Render triangle */
+        glBindTexture(GL_TEXTURE_2D, texture);
 	shader1.Use();
 	triangle_upper.Render();
+
+        glBindTexture(GL_TEXTURE_2D, 0);
 	shader2.Use();
 	triangle_lower.Render();
 

@@ -39,6 +39,7 @@ public:
     Vertex(const glm::vec3& position);
     Vertex(const glm::vec3& position, const glm::vec3& color);
     Vertex(const glm::vec3& position, const glm::vec2& texture_coords);
+    Vertex(const glm::vec3& position, const glm::vec3& color, const glm::vec2& texture_coords);
     Vertex(const glm::vec3& position, const glm::vec3& color, const glm::vec2& texture_coords, const glm::vec3& normal);
 
     glm::vec3 position;
