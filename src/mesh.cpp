@@ -32,14 +32,30 @@
 
 Mesh::Mesh(std::initializer_list<Vertex> vertices) {
     std::vector<GLfloat> vertex_positions;
+    bool has_color;
+    GLuint stride;
 
     draw_count = vertices.end() - vertices.begin();
 
     /* Process the input vertices into usable buffers */
     for (const Vertex* it=vertices.begin(); it != vertices.end(); it++) {
-        vertex_positions.push_back(it->x);
-        vertex_positions.push_back(it->y);
-        vertex_positions.push_back(it->z);
+        vertex_positions.push_back(it->position.x);
+        vertex_positions.push_back(it->position.y);
+        vertex_positions.push_back(it->position.z);
+
+	if (it->has_color) {
+            has_color = true;
+            vertex_positions.push_back(it->color.r);
+            vertex_positions.push_back(it->color.g);
+            vertex_positions.push_back(it->color.b);
+	}
+    }
+
+    /* Figure out what stride we should use */
+    if (has_color) {
+        stride = 6 * sizeof(GLfloat);
+    } else {
+        stride = 3 * sizeof(GLfloat);
     }
 
     /* Create the vertex object array that'll store the mesh render info */
@@ -54,7 +70,13 @@ Mesh::Mesh(std::initializer_list<Vertex> vertices) {
 
     /* Assign the position information to the first attribute */
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0);
+
+    /* If we have a color assign the attribute information */
+    if (has_color) {
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(GLfloat)));
+    }
 
     /* Unbind the vertex object array and all buffers */
     glBindBuffer(GL_ARRAY_BUFFER, 0);

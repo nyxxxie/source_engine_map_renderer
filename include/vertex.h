@@ -30,15 +30,24 @@
 #include <exception>
 #include <initializer_list>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 #include "shader.h"
+
 
 class Vertex {
 public:
-    Vertex(GLfloat x, GLfloat y, GLfloat z);
+    Vertex(const glm::vec3& position);
+    Vertex(const glm::vec3& position, const glm::vec3& color);
+    Vertex(const glm::vec3& position, const glm::vec2& texture_coords);
+    Vertex(const glm::vec3& position, const glm::vec3& color, const glm::vec2& texture_coords, const glm::vec3& normal);
 
-    GLfloat x;
-    GLfloat y;
-    GLfloat z;
+    glm::vec3 position;
+    glm::vec3 color;
+    bool has_color;
+    glm::vec2 texture_coords;
+    bool has_texture_coords;
+    glm::vec3 normal;
+    bool has_normal;
 };
 
 #endif // VERTEX_H

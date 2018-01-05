@@ -84,37 +84,24 @@ int main(int argc, char* argv[]) {
     /*  Register a callback to resize the draw space when the window changes */
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    Shader shader("./assets/shaders/reg_vertex.vshader",
-                  "./assets/shaders/reg_vertex.fshader");
-    Mesh triangle({
-        Vertex(-0.4f, -0.1f, 0.0f),
-        Vertex( 0.4f, -0.1f, 0.0f),
-        Vertex( 0.0f, -0.5f, 0.0f),
+    Shader shader1("./assets/shaders/reg_vertex.vshader",
+                   "./assets/shaders/reg_vertex.fshader");
+    Mesh triangle_upper({
+        Vertex(glm::vec3(-0.4f, 0.1f, 0.0f)),  // left vertex
+        Vertex(glm::vec3( 0.4f, 0.1f, 0.0f)),  // right vertex
+        Vertex(glm::vec3( 0.0f, 0.5f, 0.0f)),  // top vertex
     });
 
-    GLuint vbo, vao;
-    float vertices[] = {
-       -0.4f, 0.1f, 0.0f, // left
-        0.4f, 0.1f, 0.0f, // right
-        0.0f, 0.5f, 0.0f  // top
-    };
-
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-    glBindVertexArray(vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glBindVertexArray(0);
+    Shader shader2("./assets/shaders/colored_vertex.vshader",
+                   "./assets/shaders/colored_vertex.fshader");
+    Mesh triangle_lower({
+        Vertex(glm::vec3(-0.4f, -0.1f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f)),  // left vertex
+        Vertex(glm::vec3( 0.4f, -0.1f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)),  // right vertex
+        Vertex(glm::vec3( 0.0f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),  // top vertex
+    });
 
     /* Draw in wireframe mode */
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     /* Start render loop! */
     printf("Rendering started.\n");
@@ -127,10 +114,10 @@ int main(int argc, char* argv[]) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         /* Render triangle */
-	shader.Use();
-	triangle.Render();
-        glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+	shader1.Use();
+	triangle_upper.Render();
+	shader2.Use();
+	triangle_lower.Render();
 
         /* Check and call events and swap the buffers */
         glfwPollEvents();
