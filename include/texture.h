@@ -45,7 +45,8 @@ private:
 
 class Texture {
 public:
-    Texture(const std::string& texture_file, GLenum active_texture=GL_TEXTURE0);
+    Texture(const std::string& texture_file, GLenum active_texture=GL_TEXTURE0,
+            GLenum format=GL_RGB, bool flip=false);
 
     void Use();
 

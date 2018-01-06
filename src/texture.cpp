@@ -26,7 +26,8 @@
 #include "graphics/stb_image.h"
 
 
-Texture::Texture(const std::string& texture_file, GLenum active_texture) {
+Texture::Texture(const std::string& texture_file, GLenum active_texture,
+		 GLenum format, bool flip) {
     this->active_texture = active_texture;
 
     /* Create and bind opengl texture object */
@@ -41,6 +42,11 @@ Texture::Texture(const std::string& texture_file, GLenum active_texture) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    /* Flip texture if requested */
+    if (flip) {
+        stbi_set_flip_vertically_on_load(true);
+    }
+
     /* Load texture from image file */
     unsigned char* data = stbi_load(texture_file.c_str(), &width, &height,
 		                    &channels, 0);
@@ -49,7 +55,7 @@ Texture::Texture(const std::string& texture_file, GLenum active_texture) {
     }
 
     /* Load texture into GPU */
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
     /* Generate mipmaps */
     glGenerateMipmap(GL_TEXTURE_2D);

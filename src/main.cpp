@@ -82,13 +82,13 @@ int main(int argc, char* argv[]) {
     /*  Register a callback to resize the draw space when the window changes */
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    Shader shader1("./assets/shaders/colored_textured_vertex.vshader",
-                   "./assets/shaders/colored_textured_vertex.fshader");
+    Shader shader1("./assets/shaders/textured_vertex.vshader",
+                   "./assets/shaders/textured_mixed_vertex.fshader");
     Mesh triangle_upper({
-        Vertex(glm::vec3( 0.4f, 0.9f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)),  // top right
-        Vertex(glm::vec3( 0.4f, 0.1f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f)),  // bottom right
-        Vertex(glm::vec3(-0.4f, 0.1f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)),  // bottom left
-        Vertex(glm::vec3(-0.4f, 0.9f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)),  // top left
+        Vertex(glm::vec3( 0.4f, 0.9f, 0.0f), glm::vec2(1.0f, 1.0f)),  // top right
+        Vertex(glm::vec3( 0.4f, 0.1f, 0.0f), glm::vec2(1.0f, 0.0f)),  // bottom right
+        Vertex(glm::vec3(-0.4f, 0.1f, 0.0f), glm::vec2(0.0f, 0.0f)),  // bottom left
+        Vertex(glm::vec3(-0.4f, 0.9f, 0.0f), glm::vec2(0.0f, 1.0f)),  // top left
     }, {
         0, 1, 3,
 	1, 2, 3
@@ -103,6 +103,7 @@ int main(int argc, char* argv[]) {
     });
 
     Texture texture1("assets/textures/container.jpg");
+    Texture texture2("assets/textures/awesomeface.png", GL_TEXTURE1, GL_RGBA, true);
 
     /* Draw in wireframe mode */
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -110,6 +111,8 @@ int main(int argc, char* argv[]) {
     /* Start render loop! */
     printf("Rendering started.\n");
     while (!glfwWindowShouldClose(window)) {
+	/* Calculate an evolving time value to play with */
+	float cycling_val = sin(glfwGetTime() - (110.0f*(M_PI/180.0f))) / 2.0f + 0.5;
         /* Process input */
         process_input(window);
 
@@ -119,7 +122,11 @@ int main(int argc, char* argv[]) {
 
         /* Render triangle */
 	texture1.Use();
+	texture2.Use();
 	shader1.Use();
+	shader1.SetUniform("texture1", 0);
+	shader1.SetUniform("texture2", 1);
+	shader1.SetUniform("mix_amt", cycling_val);
 	triangle_upper.Render();
 
         glBindTexture(GL_TEXTURE_2D, 0);
