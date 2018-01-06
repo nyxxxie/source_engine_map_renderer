@@ -23,7 +23,6 @@
  * related to starting the program.
  */
 
-#include <stdio.h>
 #include <initializer_list>
 #include <vector>
 #include <glad/glad.h>
@@ -78,8 +77,8 @@ Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint>
     pos_offset = 0;
     if (has_color) {
         color_offset = base_offset;
-	base_offset += 3 * sizeof(GLfloat);
-        stride += 3 * sizeof(GLfloat);
+	base_offset += (3 * sizeof(GLfloat));
+        stride += (3 * sizeof(GLfloat));
     }
     if (has_texture_coords) {
         texture_coords_offset = base_offset;
@@ -120,7 +119,6 @@ Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint>
     if (has_texture_coords) {
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)texture_coords_offset);
-	printf("s:%i off:%i\n", stride, texture_coords_offset);
     }
 
     /* Unbind the vertex array object and our data buffer since we're done

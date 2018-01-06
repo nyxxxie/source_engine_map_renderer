@@ -84,13 +84,13 @@ int main(int argc, char* argv[]) {
     /*  Register a callback to resize the draw space when the window changes */
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    Shader shader1("./assets/shaders/textured_vertex.vshader",
-                   "./assets/shaders/textured_vertex.fshader");
+    Shader shader1("./assets/shaders/colored_textured_vertex.vshader",
+                   "./assets/shaders/colored_textured_vertex.fshader");
     Mesh triangle_upper({
-        Vertex(glm::vec3( 0.4f, 0.9f, 0.0f), glm::vec2(1.0f, 1.0f)),  // top right
-        Vertex(glm::vec3( 0.4f, 0.1f, 0.0f), glm::vec2(1.0f, 0.0f)),  // bottom right
-        Vertex(glm::vec3(-0.4f, 0.1f, 0.0f), glm::vec2(0.0f, 0.0f)),  // bottom left
-        Vertex(glm::vec3(-0.4f, 0.9f, 0.0f), glm::vec2(0.0f, 1.0f)),  // top left
+        Vertex(glm::vec3( 0.4f, 0.9f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)),  // top right
+        Vertex(glm::vec3( 0.4f, 0.1f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f)),  // bottom right
+        Vertex(glm::vec3(-0.4f, 0.1f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)),  // bottom left
+        Vertex(glm::vec3(-0.4f, 0.9f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)),  // top left
     }, {
         0, 1, 3,
 	1, 2, 3
