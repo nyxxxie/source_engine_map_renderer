@@ -36,11 +36,10 @@
 
 class Vertex {
 public:
-    Vertex(const glm::vec3& position);
-    Vertex(const glm::vec3& position, const glm::vec3& color);
-    Vertex(const glm::vec3& position, const glm::vec2& texture_coords);
-    Vertex(const glm::vec3& position, const glm::vec3& color, const glm::vec2& texture_coords);
-    Vertex(const glm::vec3& position, const glm::vec3& color, const glm::vec2& texture_coords, const glm::vec3& normal);
+    Vertex(float pos_x, float pos_y, float pos_z);
+    Vertex(float pos_x, float pos_y, float pos_z, float tex_x, float tex_y);
+    Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b);
+    Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b, float tex_x, float tex_y);
 
     glm::vec3 position;
     glm::vec3 color;

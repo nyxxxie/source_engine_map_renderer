@@ -27,45 +27,38 @@
 #include <glad/glad.h>
 #include "vertex.h"
 
-
-Vertex::Vertex(const glm::vec3& position) {
-    this->position = position;
+Vertex::Vertex(float pos_x, float pos_y, float pos_z) {
     this->has_color = false;
     this->has_texture_coords = false;
     this->has_normal = false;
+
+    this->position = glm::vec3(pos_x, pos_y, pos_z);
 }
 
-Vertex::Vertex(const glm::vec3& position, const glm::vec3& color) {
-    this->position = position;
-    this->color = color;
-    this->has_color = true;
-    this->has_texture_coords = false;
-    this->has_normal = false;
-}
-
-Vertex::Vertex(const glm::vec3& position, const glm::vec2& texture_coords) {
-    this->position = position;
-    this->texture_coords = texture_coords;
+Vertex::Vertex(float pos_x, float pos_y, float pos_z, float tex_x, float tex_y) {
     this->has_color = false;
     this->has_texture_coords = true;
     this->has_normal = false;
+
+    this->position = glm::vec3(pos_x, pos_y, pos_z);
+    this->texture_coords = glm::vec2(tex_x, tex_y);
 }
 
-Vertex::Vertex(const glm::vec3& position, const glm::vec3& color, const glm::vec2& texture_coords) {
-    this->position = position;
-    this->color = color;
-    this->texture_coords = texture_coords;
+Vertex::Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b) {
+    this->has_color = true;
+    this->has_texture_coords = false;
+    this->has_normal = false;
+
+    this->position = glm::vec3(pos_x, pos_y, pos_z);
+    this->color = glm::vec3(r, g, b);
+}
+
+Vertex::Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b, float tex_x, float tex_y) {
     this->has_color = true;
     this->has_texture_coords = true;
     this->has_normal = false;
-}
 
-Vertex::Vertex(const glm::vec3& position, const glm::vec3& color, const glm::vec2& texture_coords, const glm::vec3& normal) {
-    this->position = position;
-    this->color = color;
-    this->texture_coords = texture_coords;
-    this->normal = normal;
-    this->has_color = true;
-    this->has_texture_coords = true;
-    this->has_normal = true;
+    this->position = glm::vec3(pos_x, pos_y, pos_z);
+    this->color = glm::vec3(r, g, b);
+    this->texture_coords = glm::vec2(tex_x, tex_y);
 }
