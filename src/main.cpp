@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <vector>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -153,14 +154,6 @@ int main(int argc, char* argv[]) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /* Create the various matricies that make this a 3d scene */
-        glm::mat4 model;
-        model = glm::rotate(model, rotating_val * glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, rotating_val * glm::radians(70.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::mat4 view;
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -(cycling_val * 2.0f) - 2.0f));
-        glm::mat4 projection;
-        projection = glm::perspective(glm::radians(45.0f), float(WINDOW_WIDTH)/WINDOW_HEIGHT, 0.1f, 100.0f);
 
 
         /* Render triangle */
@@ -169,10 +162,40 @@ int main(int argc, char* argv[]) {
 	shader1.Use();
 	shader1.SetUniform("texture1", 0);
 	shader1.SetUniform("texture2", 1);
-	glUniformMatrix4fv(shader1.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
-	glUniformMatrix4fv(shader1.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+
+	/* Create the projection matrix and send it to the vertex shader */
+        glm::mat4 projection;
+        projection = glm::perspective(glm::radians(45.0f), float(WINDOW_WIDTH)/WINDOW_HEIGHT, 0.1f, 100.0f);
 	glUniformMatrix4fv(shader1.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	box.Render();
+
+	/* Create the view matrix and send it to the vertex shader */
+        glm::mat4 view;
+        view = glm::translate(view, glm::vec3(0.0f, cycling_val, -5.0f));
+        view = glm::rotate(view, rotating_val, glm::vec3(0.0f, 1.0f, 0.0f));
+        view = glm::rotate(view, rotating_val*2.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	glUniformMatrix4fv(shader1.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+
+	std::vector<glm::vec3> cube_positions = {
+            glm::vec3( 0.0f,  0.0f,  0.0f), 
+            glm::vec3( 2.0f,  5.0f, -15.0f), 
+            glm::vec3(-1.5f, -2.2f, -2.5f),  
+            glm::vec3(-3.8f, -2.0f, -12.3f),  
+            glm::vec3( 2.4f, -0.4f, -3.5f),  
+            glm::vec3(-1.7f,  3.0f, -7.5f),  
+            glm::vec3( 1.3f, -2.0f, -2.5f),  
+            glm::vec3( 1.5f,  2.0f, -2.5f), 
+            glm::vec3( 1.5f,  0.2f, -1.5f), 
+            glm::vec3(-1.3f,  1.0f, -1.5f)  
+        };
+
+	for (int i = 0; i < cube_positions.size(); i++) {
+            glm::mat4 model;
+	    model = glm::translate(model, cube_positions[i]);
+            model = glm::rotate(model, rotating_val * glm::radians(50.0f * i), glm::vec3(1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, rotating_val * glm::radians(70.0f * i), glm::vec3(0.0f, 1.0f, 0.0f));
+	    glUniformMatrix4fv(shader1.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+	    box.Render();
+	}
 
         /* Check and call events and swap the buffers */
         glfwPollEvents();
