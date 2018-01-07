@@ -26,6 +26,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <GLFW/glfw3.h>
 #include "shader.h"
 #include "mesh.h"
@@ -43,7 +46,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 /**
-j * Processes input key presses
+ * Processes input key presses
  */
 void process_input(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -82,24 +85,53 @@ int main(int argc, char* argv[]) {
     /*  Register a callback to resize the draw space when the window changes */
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    Shader shader1("./assets/shaders/textured_vertex.vshader",
-                   "./assets/shaders/textured_mixed_vertex.fshader");
-    Mesh triangle_upper({
-        Vertex(glm::vec3( 0.4f, 0.9f, 0.0f), glm::vec2(1.0f, 1.0f)),  // top right
-        Vertex(glm::vec3( 0.4f, 0.1f, 0.0f), glm::vec2(1.0f, 0.0f)),  // bottom right
-        Vertex(glm::vec3(-0.4f, 0.1f, 0.0f), glm::vec2(0.0f, 0.0f)),  // bottom left
-        Vertex(glm::vec3(-0.4f, 0.9f, 0.0f), glm::vec2(0.0f, 1.0f)),  // top left
-    }, {
-        0, 1, 3,
-	1, 2, 3
-    });
+    /* Inform OpenGL we'd like to enable depth testing */
+    glEnable(GL_DEPTH_TEST);
 
-    Shader shader2("./assets/shaders/colored_vertex.vshader",
-                   "./assets/shaders/colored_vertex.fshader");
-    Mesh triangle_lower({
-        Vertex(glm::vec3(-0.4f, -0.1f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f)),  // left vertex
-        Vertex(glm::vec3( 0.4f, -0.1f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)),  // right vertex
-        Vertex(glm::vec3( 0.0f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),  // top vertex
+    Shader shader1("./assets/shaders/textured_transform_vertex.vshader",
+                   "./assets/shaders/textured_mixed_vertex.fshader");
+    Mesh box({
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 0.0f),
+        Vertex( 0.5f, -0.5f, -0.5f,  1.0f, 0.0f),
+        Vertex( 0.5f,  0.5f, -0.5f,  1.0f, 1.0f),
+        Vertex( 0.5f,  0.5f, -0.5f,  1.0f, 1.0f),
+        Vertex(-0.5f,  0.5f, -0.5f,  0.0f, 1.0f),
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 0.0f),
+
+        Vertex(-0.5f, -0.5f,  0.5f,  0.0f, 0.0f),
+        Vertex( 0.5f, -0.5f,  0.5f,  1.0f, 0.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f, 1.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f, 1.0f),
+        Vertex(-0.5f,  0.5f,  0.5f,  0.0f, 1.0f),
+        Vertex(-0.5f, -0.5f,  0.5f,  0.0f, 0.0f),
+
+        Vertex(-0.5f,  0.5f,  0.5f,  1.0f, 0.0f),
+        Vertex(-0.5f,  0.5f, -0.5f,  1.0f, 1.0f),
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 1.0f),
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 1.0f),
+        Vertex(-0.5f, -0.5f,  0.5f,  0.0f, 0.0f),
+        Vertex(-0.5f,  0.5f,  0.5f,  1.0f, 0.0f),
+
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f, 0.0f),
+        Vertex( 0.5f,  0.5f, -0.5f,  1.0f, 1.0f),
+        Vertex( 0.5f, -0.5f, -0.5f,  0.0f, 1.0f),
+        Vertex( 0.5f, -0.5f, -0.5f,  0.0f, 1.0f),
+        Vertex( 0.5f, -0.5f,  0.5f,  0.0f, 0.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f, 0.0f),
+
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 1.0f),
+        Vertex( 0.5f, -0.5f, -0.5f,  1.0f, 1.0f),
+        Vertex( 0.5f, -0.5f,  0.5f,  1.0f, 0.0f),
+        Vertex( 0.5f, -0.5f,  0.5f,  1.0f, 0.0f),
+        Vertex(-0.5f, -0.5f,  0.5f,  0.0f, 0.0f),
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 1.0f),
+
+        Vertex(-0.5f,  0.5f, -0.5f,  0.0f, 1.0f),
+        Vertex( 0.5f,  0.5f, -0.5f,  1.0f, 1.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f, 0.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f, 0.0f),
+        Vertex(-0.5f,  0.5f,  0.5f,  0.0f, 0.0f),
+        Vertex(-0.5f,  0.5f, -0.5f,  0.0f, 1.0f)
     });
 
     Texture texture1("assets/textures/container.jpg");
@@ -107,18 +139,29 @@ int main(int argc, char* argv[]) {
 
     /* Draw in wireframe mode */
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+ 
     /* Start render loop! */
     printf("Rendering started.\n");
     while (!glfwWindowShouldClose(window)) {
 	/* Calculate an evolving time value to play with */
-	float cycling_val = sin(glfwGetTime() - (110.0f*(M_PI/180.0f))) / 2.0f + 0.5;
+	float cycling_val = (sin(glfwGetTime() - glm::radians(90.0f)) + 1.0f) * 0.5f;
+	float rotating_val = float(glfwGetTime()) / 2.0f;
         /* Process input */
         process_input(window);
 
         /* Set the color the screen will clear to and then clear it */
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        /* Create the various matricies that make this a 3d scene */
+        glm::mat4 model;
+        model = glm::rotate(model, rotating_val * glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, rotating_val * glm::radians(70.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 view;
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -(cycling_val * 2.0f) - 2.0f));
+        glm::mat4 projection;
+        projection = glm::perspective(glm::radians(45.0f), float(WINDOW_WIDTH)/WINDOW_HEIGHT, 0.1f, 100.0f);
+
 
         /* Render triangle */
 	texture1.Use();
@@ -126,12 +169,10 @@ int main(int argc, char* argv[]) {
 	shader1.Use();
 	shader1.SetUniform("texture1", 0);
 	shader1.SetUniform("texture2", 1);
-	shader1.SetUniform("mix_amt", cycling_val);
-	triangle_upper.Render();
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-	shader2.Use();
-	triangle_lower.Render();
+	glUniformMatrix4fv(shader1.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(shader1.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(shader1.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	box.Render();
 
         /* Check and call events and swap the buffers */
         glfwPollEvents();
