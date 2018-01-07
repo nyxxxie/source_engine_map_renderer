@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
     while (!glfwWindowShouldClose(window)) {
 	/* Calculate an evolving time value to play with */
 	float cycling_val = (sin(glfwGetTime() - glm::radians(90.0f)) + 1.0f) * 0.5f;
-	float rotating_val = float(glfwGetTime()) / 2.0f;
+	float rotating_val = float(glfwGetTime());
         /* Process input */
         process_input(window);
 
@@ -170,10 +170,14 @@ int main(int argc, char* argv[]) {
 
 	/* Create the view matrix and send it to the vertex shader */
         glm::mat4 view;
-        view = glm::translate(view, glm::vec3(0.0f, cycling_val, -5.0f));
-        view = glm::rotate(view, rotating_val, glm::vec3(0.0f, 1.0f, 0.0f));
-        view = glm::rotate(view, rotating_val*2.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-	glUniformMatrix4fv(shader1.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+	float radius = 10.0f;
+	float cam_x = sin(glfwGetTime()) * radius;
+	float cam_z = cos(glfwGetTime()) * radius;
+	glm::vec3 camera_pos(cam_x, 0.0f, cam_z);
+	glm::vec3 target_pos(0.0f, 0.0f, 0.0f);
+	glm::vec3 up(0.0f, 1.0f, 0.5f);
+	view = glm::lookAt(camera_pos, target_pos, up);
+        glUniformMatrix4fv(shader1.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
 
 	std::vector<glm::vec3> cube_positions = {
             glm::vec3( 0.0f,  0.0f,  0.0f), 
@@ -191,8 +195,8 @@ int main(int argc, char* argv[]) {
 	for (int i = 0; i < cube_positions.size(); i++) {
             glm::mat4 model;
 	    model = glm::translate(model, cube_positions[i]);
-            model = glm::rotate(model, rotating_val * glm::radians(50.0f * i), glm::vec3(1.0f, 0.0f, 0.0f));
-            model = glm::rotate(model, rotating_val * glm::radians(70.0f * i), glm::vec3(0.0f, 1.0f, 0.0f));
+            model = glm::rotate(model, (rotating_val / 5.0f) * glm::radians(50.0f * i), glm::vec3(1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, (rotating_val / 5.0f) * glm::radians(70.0f * i), glm::vec3(0.0f, 1.0f, 0.0f));
 	    glUniformMatrix4fv(shader1.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
 	    box.Render();
 	}
