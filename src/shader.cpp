@@ -101,6 +101,7 @@ Shader::Shader(const std::string& vertex_shader_path,
 void Shader::Use() {
     glUseProgram(this->id());
 }
+
 /**
  *
  */
@@ -111,25 +112,27 @@ GLuint Shader::id() {
 /**
  *
  */
-void Shader::SetUniform(const std::string& name, GLint value) {
-    int loc = glGetUniformLocation(this->id(), name.c_str());
-    if (loc < 0) {
+GLint Shader::GetUniformLocation(const std::string& name, bool except) {
+    GLint loc = glGetUniformLocation(this->id(), name.c_str());
+    if (loc < 0 && except) {
         throw ShaderException("Failed to find shader uniform \"" + name +"\"");
     }
 
-    glUniform1i(loc, value);
+    return loc;
+}
+
+/**
+ *
+ */
+void Shader::SetUniform(const std::string& name, GLint value) {
+    glUniform1i(GetUniformLocation(name), value);
 }
 
 /**
  *
  */
 void Shader::SetUniform(const std::string& name, GLfloat value) {
-    int loc = glGetUniformLocation(this->id(), name.c_str());
-    if (loc < 0) {
-        throw ShaderException("Failed to find shader uniform \"" + name +"\"");
-    }
-
-    glUniform1f(loc, value);
+    glUniform1f(GetUniformLocation(name), value);
 }
 
 /**

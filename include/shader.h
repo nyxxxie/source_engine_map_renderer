@@ -29,6 +29,7 @@
 #include <string>
 #include <exception>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 class ShaderException : public std::exception {
 public:
@@ -50,8 +51,8 @@ public:
            const std::string& fragment_shader_path);
 
     void Use();
-
     GLuint id();
+    GLint GetUniformLocation(const std::string& name, bool except=true);
     void SetUniform(const std::string& name, GLint value);
     void SetUniform(const std::string& name, GLfloat value);
 
