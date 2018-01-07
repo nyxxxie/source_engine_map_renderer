@@ -59,8 +59,8 @@ public:
 private:
     GLuint program_id;
 
-GLuint CreateShaderFromString(std::string shader_src, GLenum shadertype,
-                              char* infolog, const size_t infolog_size);
+    GLuint CreateShaderFromString(std::string shader_src, GLenum shadertype,
+                                  char* infolog, const size_t infolog_size);
 };
 
 #endif // SHADER_H
