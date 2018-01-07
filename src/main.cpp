@@ -39,6 +39,16 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
+glm::vec3 camera_pos(0.0f, 0.0f, 3.0f);
+glm::vec3 camera_front(0.0f, 0.0f, -1.0f);
+glm::vec3 camera_up(0.0f, 1.0f, 0.0f);
+float delta_time = 0.0f;
+float last_frame = 0.0f;
+float pitch = 0.0f;
+float yaw = -90.0f;
+float last_x = WINDOW_WIDTH*0.5f;
+float last_y = WINDOW_HEIGHT*0.5f;
+
 /**
  * Called to resize the opengl viewport when the window dimensions are altered
  */
@@ -53,12 +63,62 @@ void process_input(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
+
+    float camera_speed = 7.0f * delta_time;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera_pos += camera_speed * camera_front;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera_pos -= camera_speed * camera_front;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera_pos -= camera_speed * glm::normalize(glm::cross(camera_front, camera_up));
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera_pos += camera_speed * glm::normalize(glm::cross(camera_front, camera_up));
+}
+
+/**
+ * Callback for mouse events
+ */
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    /* If this is the first time running this function, set the mouse coords to
+       the current frame's values */
+    static bool first_run = true;
+    if (first_run) {
+        last_x = xpos;
+        last_y = ypos;
+        first_run = false;
+    }
+
+    /* Calculate movement offset between the last and current frame */
+    float xoffset = xpos - last_x;
+    float yoffset = last_y - ypos;
+    last_x = xpos;
+    last_y = ypos;
+
+    /* Weaken the movement speed by a sensitivity coefficient */
+    float sensitivity = 0.10f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    /* Offset pitch and yaw by the calculated movement offsets */
+    pitch += yoffset;
+    yaw += xoffset;
+
+    /* Lock pitch to a fixed min/max */
+    if (pitch > 89.0f) { pitch = 89.0f; }
+    if (pitch < -89.0f) { pitch = -89.0f; }
+
+    /* Calculate the direction vector to point the camera in */
+    camera_front = glm::normalize(glm::vec3(
+        cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
+        sin(glm::radians(pitch)),
+        sin(glm::radians(yaw)) * cos(glm::radians(pitch))));
 }
 
 /**
  * Entry point.
  */
 int main(int argc, char* argv[]) {
+
     /* Init glfw */
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -85,6 +145,11 @@ int main(int argc, char* argv[]) {
 
     /*  Register a callback to resize the draw space when the window changes */
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    
+    /* Bind mouse to the screen and register a callback when its positon
+       changes */
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouse_callback);
 
     /* Inform OpenGL we'd like to enable depth testing */
     glEnable(GL_DEPTH_TEST);
@@ -144,10 +209,16 @@ int main(int argc, char* argv[]) {
     /* Start render loop! */
     printf("Rendering started.\n");
     while (!glfwWindowShouldClose(window)) {
+        /* Calculate delta_time so that we can smooth movement */
+        float current_frame = glfwGetTime();
+	delta_time = current_frame - last_frame;
+	last_frame = current_frame;
+
 	/* Calculate an evolving time value to play with */
 	float cycling_val = (sin(glfwGetTime() - glm::radians(90.0f)) + 1.0f) * 0.5f;
 	float rotating_val = float(glfwGetTime());
-        /* Process input */
+
+        /* Process keyboard input */
         process_input(window);
 
         /* Set the color the screen will clear to and then clear it */
@@ -170,13 +241,7 @@ int main(int argc, char* argv[]) {
 
 	/* Create the view matrix and send it to the vertex shader */
         glm::mat4 view;
-	float radius = 10.0f;
-	float cam_x = sin(glfwGetTime()) * radius;
-	float cam_z = cos(glfwGetTime()) * radius;
-	glm::vec3 camera_pos(cam_x, 0.0f, cam_z);
-	glm::vec3 target_pos(0.0f, 0.0f, 0.0f);
-	glm::vec3 up(0.0f, 1.0f, 0.5f);
-	view = glm::lookAt(camera_pos, target_pos, up);
+	view = glm::lookAt(camera_pos, camera_pos + camera_front, camera_up);
         glUniformMatrix4fv(shader1.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
 
 	std::vector<glm::vec3> cube_positions = {
