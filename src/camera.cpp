@@ -26,7 +26,7 @@
 
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) {
-    this->position = position;
+    this->pos = position;
     this->world_up = up;
     this->yaw = yaw;
     this->pitch = pitch;
@@ -43,13 +43,13 @@ void Camera::ProcessKeyboard(Movement direction, float delta_time,
 
     /* Move position of camera based on what direction is desired */
     if (direction == FORWARD)
-        position += front * velocity;
+        pos += front * velocity;
     if (direction == BACKWARD)
-        position -= front * velocity;
+        pos -= front * velocity;
     if (direction == LEFT)
-        position -= right * velocity;
+        pos -= right * velocity;
     if (direction == RIGHT)
-        position += right * velocity;
+        pos += right * velocity;
 }
 
 void Camera::ProcessMouseMovement(float x_offset, float y_offset,
@@ -76,7 +76,7 @@ void Camera::ProcessMouseMovement(float x_offset, float y_offset,
 
 glm::mat4 Camera::GetViewMatrix() {
     //TODO: explain math
-    return glm::lookAt(position, position + front, up);
+    return glm::lookAt(pos, pos + front, up);
 }
 
 void Camera::CalcCameraVectors() {
