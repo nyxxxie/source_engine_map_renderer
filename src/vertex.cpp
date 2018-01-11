@@ -38,41 +38,21 @@ Vertex::Vertex(float pos_x, float pos_y, float pos_z, float tex_x, float tex_y) 
     SetTexCoords(tex_x, tex_y);
 }
 
-Vertex::Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b) {
+Vertex::Vertex(float pos_x, float pos_y, float pos_z, float norm_x, float norm_y, float norm_z) {
     Init();
     SetPos(pos_x, pos_y, pos_z);
-    SetColor(r, g, b);
-}
-
-Vertex::Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b, float tex_x, float tex_y) {
-    Init();
-    SetPos(pos_x, pos_y, pos_z);
-    SetColor(r, g, b);
-    SetTexCoords(tex_x, tex_y);
-}
-
-Vertex::Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b, float norm_x, float norm_y, float norm_z) {
-    Init();
-    SetPos(pos_x, pos_y, pos_z);
-    SetColor(r, g, b);
     SetNormals(norm_x, norm_y, norm_z);
 }
 
-Vertex::Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b, float tex_x, float tex_y, float norm_x, float norm_y, float norm_z) {
+Vertex::Vertex(float pos_x, float pos_y, float pos_z, float tex_x, float tex_y, float norm_x, float norm_y, float norm_z) {
     Init();
     SetPos(pos_x, pos_y, pos_z);
-    SetColor(r, g, b);
     SetTexCoords(tex_x, tex_y);
     SetNormals(norm_x, norm_y, norm_z);
 }
 
 void Vertex::SetPos(const float x, const float y, const float z) {
     this->position = glm::vec3(x, y, z);
-}
-
-void Vertex::SetColor(const float r, const float g, const float b) {
-    this->has_color = true;
-    this->color = glm::vec3(r, g, b);
 }
 
 void Vertex::SetTexCoords(const float x, const float y) {
@@ -86,7 +66,6 @@ void Vertex::SetNormals(const float x, const float y, const float z) {
 }
 
 void Vertex::Init() {
-    this->has_color = false;
     this->has_texture_coords = false;
     this->has_normal = false;
 }

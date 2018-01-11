@@ -38,19 +38,14 @@ class Vertex {
 public:
     Vertex(float pos_x, float pos_y, float pos_z);
     Vertex(float pos_x, float pos_y, float pos_z, float tex_x, float tex_y);
-    Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b);
-    Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b, float tex_x, float tex_y);
-    Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b, float norm_x, float norm_y, float norm_z);
-    Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b, float tex_x, float tex_y, float norm_x, float norm_y, float norm_z);
+    Vertex(float pos_x, float pos_y, float pos_z, float norm_x, float norm_y, float norm_z);
+    Vertex(float pos_x, float pos_y, float pos_z, float tex_x, float tex_y, float norm_x, float norm_y, float norm_z);
 
     void SetPos(const float x, const float y, const float z);
-    void SetColor(const float r, const float g, const float b);
     void SetTexCoords(const float x, const float y);
     void SetNormals(const float x, const float y, const float z);
 
     glm::vec3 position;
-    glm::vec3 color;
-    bool has_color;
     glm::vec2 texture_coords;
     bool has_texture_coords;
     glm::vec3 normal;

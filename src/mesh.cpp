@@ -32,10 +32,10 @@
 Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint> indices) {
     std::vector<GLfloat> vertex_data;
     std::vector<GLuint> index_data;
-    bool has_color;
     bool has_texture_coords;
+    bool has_normal;
     GLuint stride;
-    unsigned long base_offset, pos_offset, color_offset, texture_coords_offset;
+    unsigned long base_offset, pos_offset, normal_offset, texture_coords_offset;
 
     /* Process the input indices into usable buffers */
     has_indices = false;
@@ -45,23 +45,24 @@ Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint>
     }
 
     /* Process the input vertices into usable buffers */
-    has_color = false;
     has_texture_coords = false;
+    has_normal = false;
     for (const Vertex* it=vertices.begin(); it != vertices.end(); it++) {
         vertex_data.push_back(it->position.x);
         vertex_data.push_back(it->position.y);
         vertex_data.push_back(it->position.z);
 
-	if (it->has_color) {
-            has_color = true;
-            vertex_data.push_back(it->color.r);
-            vertex_data.push_back(it->color.g);
-            vertex_data.push_back(it->color.b);
-	}
 	if (it->has_texture_coords) {
             has_texture_coords = true;
             vertex_data.push_back(it->texture_coords.x);
             vertex_data.push_back(it->texture_coords.y);
+	}
+
+	if (it->has_normal) {
+            has_normal = true;
+            vertex_data.push_back(it->normal.x);
+            vertex_data.push_back(it->normal.y);
+            vertex_data.push_back(it->normal.z);
 	}
     }
 
@@ -75,8 +76,8 @@ Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint>
     stride = (3 * sizeof(GLfloat));
     base_offset = (3 * sizeof(GLfloat));
     pos_offset = 0;
-    if (has_color) {
-        color_offset = base_offset;
+    if (has_normal) {
+        normal_offset = base_offset;
 	base_offset += (3 * sizeof(GLfloat));
         stride += (3 * sizeof(GLfloat));
     }
@@ -109,16 +110,16 @@ Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint>
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)pos_offset);
 
-    /* Enable and define color vertex attribute */
-    if (has_color) {
+    /* Enable and define texture coordinates vertex attribute */
+    if (has_texture_coords) {
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)color_offset);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)texture_coords_offset);
     }
 
     /* Enable and define texture coordinates vertex attribute */
-    if (has_texture_coords) {
+    if (has_normal) {
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)texture_coords_offset);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)normal_offset);
     }
 
     /* Unbind the vertex array object and our data buffer since we're done
