@@ -146,10 +146,8 @@ int main(int argc, char* argv[]) {
     /* Inform OpenGL we'd like to enable depth testing */
     glEnable(GL_DEPTH_TEST);
 
-    Shader light_shader("./assets/shaders/transform_vertex.vshader",
-                        "./assets/shaders/lighting.fshader");
-    Shader lamp_shader("./assets/shaders/transform_vertex.vshader",
-                       "./assets/shaders/lamp.fshader");
+    Shader object_shader("./assets/shaders/base_untextured.glsl");
+    Shader lamp_shader("./assets/shaders/lamp.glsl");
     Mesh box({
         Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 0.0f),
         Vertex( 0.5f, -0.5f, -0.5f,  1.0f, 0.0f),
@@ -213,9 +211,9 @@ int main(int argc, char* argv[]) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* set the lighting shader's color */
-        light_shader.Use();
-        glUniform3f(light_shader.GetUniformLocation("object_color"), 1.0f, 0.5f, 0.31f);
-        glUniform3f(light_shader.GetUniformLocation("light_color"), 1.0f, 1.0f, 1.0f);
+        object_shader.Use();
+        glUniform3f(object_shader.GetUniformLocation("object_color"), 1.0f, 0.5f, 0.31f);
+        glUniform3f(object_shader.GetUniformLocation("light_color"), 1.0f, 1.0f, 1.0f);
 
 	/* Create the model, view, and projection transformation matricies */
         glm::mat4 projection = glm::perspective(glm::radians(CAMERA_FOV),
@@ -226,9 +224,9 @@ int main(int argc, char* argv[]) {
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
         /* Set light shader uniforms and draw the light object */
-        glUniformMatrix4fv(light_shader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(light_shader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(light_shader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(object_shader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(object_shader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(object_shader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
         box.Render();
 
 	/* Set the model shader to position the lamp away from the cube in the center */
