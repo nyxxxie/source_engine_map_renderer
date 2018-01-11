@@ -28,37 +28,65 @@
 #include "vertex.h"
 
 Vertex::Vertex(float pos_x, float pos_y, float pos_z) {
-    this->has_color = false;
-    this->has_texture_coords = false;
-    this->has_normal = false;
-
-    this->position = glm::vec3(pos_x, pos_y, pos_z);
+    Init();
+    SetPos(pos_x, pos_y, pos_z);
 }
 
 Vertex::Vertex(float pos_x, float pos_y, float pos_z, float tex_x, float tex_y) {
-    this->has_color = false;
-    this->has_texture_coords = true;
-    this->has_normal = false;
-
-    this->position = glm::vec3(pos_x, pos_y, pos_z);
-    this->texture_coords = glm::vec2(tex_x, tex_y);
+    Init();
+    SetPos(pos_x, pos_y, pos_z);
+    SetTexCoords(tex_x, tex_y);
 }
 
 Vertex::Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b) {
-    this->has_color = true;
-    this->has_texture_coords = false;
-    this->has_normal = false;
-
-    this->position = glm::vec3(pos_x, pos_y, pos_z);
-    this->color = glm::vec3(r, g, b);
+    Init();
+    SetPos(pos_x, pos_y, pos_z);
+    SetColor(r, g, b);
 }
 
 Vertex::Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b, float tex_x, float tex_y) {
-    this->has_color = true;
-    this->has_texture_coords = true;
-    this->has_normal = false;
+    Init();
+    SetPos(pos_x, pos_y, pos_z);
+    SetColor(r, g, b);
+    SetTexCoords(tex_x, tex_y);
+}
 
-    this->position = glm::vec3(pos_x, pos_y, pos_z);
+Vertex::Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b, float norm_x, float norm_y, float norm_z) {
+    Init();
+    SetPos(pos_x, pos_y, pos_z);
+    SetColor(r, g, b);
+    SetNormals(norm_x, norm_y, norm_z);
+}
+
+Vertex::Vertex(float pos_x, float pos_y, float pos_z, float r, float g, float b, float tex_x, float tex_y, float norm_x, float norm_y, float norm_z) {
+    Init();
+    SetPos(pos_x, pos_y, pos_z);
+    SetColor(r, g, b);
+    SetTexCoords(tex_x, tex_y);
+    SetNormals(norm_x, norm_y, norm_z);
+}
+
+void Vertex::SetPos(const float x, const float y, const float z) {
+    this->position = glm::vec3(x, y, z);
+}
+
+void Vertex::SetColor(const float r, const float g, const float b) {
+    this->has_color = true;
     this->color = glm::vec3(r, g, b);
-    this->texture_coords = glm::vec2(tex_x, tex_y);
+}
+
+void Vertex::SetTexCoords(const float x, const float y) {
+    this->has_texture_coords = true;
+    this->texture_coords = glm::vec2(x, y);
+}
+
+void Vertex::SetNormals(const float x, const float y, const float z) {
+    this->has_normal = true;
+    this->normal = glm::vec3(x, y, z);
+}
+
+void Vertex::Init() {
+    this->has_color = false;
+    this->has_texture_coords = false;
+    this->has_normal = false;
 }

@@ -39,6 +39,7 @@
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
+#define CAMERA_FOV 45.0f
 
 Camera camera(glm::vec3(0.0f, 0.0f, 5.0f));
 float delta_time = 0.0f;
@@ -145,8 +146,10 @@ int main(int argc, char* argv[]) {
     /* Inform OpenGL we'd like to enable depth testing */
     glEnable(GL_DEPTH_TEST);
 
-    Shader shader1("./assets/shaders/textured_transform_vertex.vshader",
-                   "./assets/shaders/textured_mixed_vertex.fshader");
+    Shader light_shader("./assets/shaders/transform_vertex.vshader",
+                        "./assets/shaders/lighting.fshader");
+    Shader lamp_shader("./assets/shaders/transform_vertex.vshader",
+                       "./assets/shaders/lamp.fshader");
     Mesh box({
         Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 0.0f),
         Vertex( 0.5f, -0.5f, -0.5f,  1.0f, 0.0f),
@@ -191,9 +194,6 @@ int main(int argc, char* argv[]) {
         Vertex(-0.5f,  0.5f, -0.5f,  0.0f, 1.0f)
     });
 
-    Texture texture1("assets/textures/container.jpg");
-    Texture texture2("assets/textures/awesomeface.png", GL_TEXTURE1, GL_RGBA, true);
-
     /* Draw in wireframe mode */
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
  
@@ -202,61 +202,46 @@ int main(int argc, char* argv[]) {
     while (!glfwWindowShouldClose(window)) {
         /* Calculate delta_time so that we can smooth movement */
         float current_frame = glfwGetTime();
-	delta_time = current_frame - last_frame;
-	last_frame = current_frame;
+        delta_time = current_frame - last_frame;
+        last_frame = current_frame;
 
-	/* Process keyboard input */
+        /* Process keyboard input */
         process_input(window);
 
-	/* Calculate an evolving time value to play with */
-	float cycling_val = (sin(glfwGetTime() - glm::radians(90.0f)) + 1.0f) * 0.5f;
-	float rotating_val = float(glfwGetTime());
-
         /* Set the color the screen will clear to and then clear it */
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /* Render triangle */
-	texture1.Use();
-	texture2.Use();
-	shader1.Use();
-	shader1.SetUniform("texture1", 0);
-	shader1.SetUniform("texture2", 1);
+        /* set the lighting shader's color */
+        light_shader.Use();
+        glUniform3f(light_shader.GetUniformLocation("object_color"), 1.0f, 0.5f, 0.31f);
+        glUniform3f(light_shader.GetUniformLocation("light_color"), 1.0f, 1.0f, 1.0f);
 
-	/* Create the projection matrix and set it as a uniform */
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-			                        float(WINDOW_WIDTH)/WINDOW_HEIGHT,
-						0.1f, 100.0f);
-	glUniformMatrix4fv(shader1.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
-
-	/* Create the view matrix and set it as a uniform */
+	/* Create the model, view, and projection transformation matricies */
+        glm::mat4 projection = glm::perspective(glm::radians(CAMERA_FOV),
+                                                float(WINDOW_WIDTH)/WINDOW_HEIGHT,
+                                                0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
-        glUniformMatrix4fv(shader1.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+        glm::mat4 model = glm::mat4();
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	std::vector<glm::vec3> cube_positions = {
-            glm::vec3( 0.0f,  0.0f,  0.0f), 
-            glm::vec3( 2.0f,  5.0f, -15.0f), 
-            glm::vec3(-1.5f, -2.2f, -2.5f),  
-            glm::vec3(-3.8f, -2.0f, -12.3f),  
-            glm::vec3( 2.4f, -0.4f, -3.5f),  
-            glm::vec3(-1.7f,  3.0f, -7.5f),  
-            glm::vec3( 1.3f, -2.0f, -2.5f),  
-            glm::vec3( 1.5f,  2.0f, -2.5f), 
-            glm::vec3( 1.5f,  0.2f, -1.5f), 
-            glm::vec3(-1.3f,  1.0f, -1.5f)  
-        };
+        /* Set light shader uniforms and draw the light object */
+        glUniformMatrix4fv(light_shader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(light_shader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(light_shader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+        box.Render();
 
-	for (int i = 0; i < cube_positions.size(); i++) {
-            /* Generate model matrix and set it as a uniform */
-            glm::mat4 model;
-	    model = glm::translate(model, cube_positions[i]);
-            model = glm::rotate(model, (rotating_val / 5.0f) * glm::radians(50.0f * i), glm::vec3(1.0f, 0.0f, 0.0f));
-            model = glm::rotate(model, (rotating_val / 5.0f) * glm::radians(70.0f * i), glm::vec3(0.0f, 1.0f, 0.0f));
-	    glUniformMatrix4fv(shader1.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+	/* Set the model shader to position the lamp away from the cube in the center */
+        model = glm::mat4();
+	model = glm::translate(model, glm::vec3(1.2f, 1.0f, 2.0f));
+	model = glm::scale(model, glm::vec3(0.5f));
 
-	    /* Render the box */
-	    box.Render();
-	}
+	/* Set lamp shader uniforms and draw the lamp object */
+        lamp_shader.Use();
+        glUniformMatrix4fv(lamp_shader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(lamp_shader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(lamp_shader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+        box.Render();
 
         /* Check and call events and swap the buffers */
         glfwPollEvents();
