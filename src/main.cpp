@@ -64,13 +64,13 @@ void key_callback(GLFWwindow* window, int key, int scode, int action, int mod) {
             glfwSetWindowShouldClose(window, true);
         }
 
-	bool sprint = bool(mod | GLFW_MOD_SHIFT);
+        bool sprint = bool(mod | GLFW_MOD_SHIFT);
     }
 }
 
 void process_input(GLFWwindow* window) {
     bool sprint = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS ||
-		   glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS);
+               	   glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS);
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.ProcessKeyboard(Camera::Movement::FORWARD, delta_time, sprint);
@@ -91,7 +91,7 @@ void mouse_callback(GLFWwindow* window, double pos_x, double pos_y) {
     if (first_call) {
         last_x = pos_x;
         last_y = pos_y;
-	first_call = false;
+        first_call = false;
     }
 
     /* Figure out offset coordinates */
@@ -149,48 +149,55 @@ int main(int argc, char* argv[]) {
     Shader object_shader("./assets/shaders/base_untextured.glsl");
     Shader lamp_shader("./assets/shaders/lamp.glsl");
     Mesh box({
-        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 0.0f),
-        Vertex( 0.5f, -0.5f, -0.5f,  1.0f, 0.0f),
-        Vertex( 0.5f,  0.5f, -0.5f,  1.0f, 1.0f),
-        Vertex( 0.5f,  0.5f, -0.5f,  1.0f, 1.0f),
-        Vertex(-0.5f,  0.5f, -0.5f,  0.0f, 1.0f),
-        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 0.0f),
+        /* Back */
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f),
+        Vertex( 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f),
+        Vertex( 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f),
+        Vertex( 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f),
+        Vertex(-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f),
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f),
 
-        Vertex(-0.5f, -0.5f,  0.5f,  0.0f, 0.0f),
-        Vertex( 0.5f, -0.5f,  0.5f,  1.0f, 0.0f),
-        Vertex( 0.5f,  0.5f,  0.5f,  1.0f, 1.0f),
-        Vertex( 0.5f,  0.5f,  0.5f,  1.0f, 1.0f),
-        Vertex(-0.5f,  0.5f,  0.5f,  0.0f, 1.0f),
-        Vertex(-0.5f, -0.5f,  0.5f,  0.0f, 0.0f),
+        /* Front */
+        Vertex(-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f),
+        Vertex( 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f),
+        Vertex(-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f),
+        Vertex(-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f),
 
-        Vertex(-0.5f,  0.5f,  0.5f,  1.0f, 0.0f),
-        Vertex(-0.5f,  0.5f, -0.5f,  1.0f, 1.0f),
-        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 1.0f),
-        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 1.0f),
-        Vertex(-0.5f, -0.5f,  0.5f,  0.0f, 0.0f),
-        Vertex(-0.5f,  0.5f,  0.5f,  1.0f, 0.0f),
+        /* Left */
+        Vertex(-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f),
+        Vertex(-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f),
+        Vertex(-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f),
+        Vertex(-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f),
+        Vertex(-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f),
+        Vertex(-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f),
 
-        Vertex( 0.5f,  0.5f,  0.5f,  1.0f, 0.0f),
-        Vertex( 0.5f,  0.5f, -0.5f,  1.0f, 1.0f),
-        Vertex( 0.5f, -0.5f, -0.5f,  0.0f, 1.0f),
-        Vertex( 0.5f, -0.5f, -0.5f,  0.0f, 1.0f),
-        Vertex( 0.5f, -0.5f,  0.5f,  0.0f, 0.0f),
-        Vertex( 0.5f,  0.5f,  0.5f,  1.0f, 0.0f),
+        /* Right */
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f),
+        Vertex( 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f),
+        Vertex( 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f),
+        Vertex( 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f),
+        Vertex( 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f),
 
-        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 1.0f),
-        Vertex( 0.5f, -0.5f, -0.5f,  1.0f, 1.0f),
-        Vertex( 0.5f, -0.5f,  0.5f,  1.0f, 0.0f),
-        Vertex( 0.5f, -0.5f,  0.5f,  1.0f, 0.0f),
-        Vertex(-0.5f, -0.5f,  0.5f,  0.0f, 0.0f),
-        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, 1.0f),
+        /* Bottom */
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f),
+        Vertex( 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f),
+        Vertex( 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f),
+        Vertex( 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f),
+        Vertex(-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f),
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f),
 
-        Vertex(-0.5f,  0.5f, -0.5f,  0.0f, 1.0f),
-        Vertex( 0.5f,  0.5f, -0.5f,  1.0f, 1.0f),
-        Vertex( 0.5f,  0.5f,  0.5f,  1.0f, 0.0f),
-        Vertex( 0.5f,  0.5f,  0.5f,  1.0f, 0.0f),
-        Vertex(-0.5f,  0.5f,  0.5f,  0.0f, 0.0f),
-        Vertex(-0.5f,  0.5f, -0.5f,  0.0f, 1.0f)
+        /* Top */
+        Vertex(-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f),
+        Vertex( 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f),
+        Vertex(-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f),
+        Vertex(-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f)
     });
+    glm::vec3 light_pos = glm::vec3(1.2f, 0.7f, 2.0f);
 
     /* Draw in wireframe mode */
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -212,16 +219,20 @@ int main(int argc, char* argv[]) {
 
         /* set the lighting shader's color */
         object_shader.Use();
+        light_pos.x = cos(glfwGetTime()) * 1.5f;
+        light_pos.z = sin(glfwGetTime()) * 1.5f;
         glUniform3f(object_shader.GetUniformLocation("object_color"), 1.0f, 0.5f, 0.31f);
         glUniform3f(object_shader.GetUniformLocation("light_color"), 1.0f, 1.0f, 1.0f);
+        glUniform3f(object_shader.GetUniformLocation("light_pos"), light_pos.x, light_pos.y, light_pos.z);
+        glUniform3f(object_shader.GetUniformLocation("view_pos"), camera.pos.x, camera.pos.y, camera.pos.z);
 
-	/* Create the model, view, and projection transformation matricies */
+        /* Create the model, view, and projection transformation matricies */
         glm::mat4 projection = glm::perspective(glm::radians(CAMERA_FOV),
                                                 float(WINDOW_WIDTH)/WINDOW_HEIGHT,
                                                 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 model = glm::mat4();
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
         /* Set light shader uniforms and draw the light object */
         glUniformMatrix4fv(object_shader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -229,12 +240,12 @@ int main(int argc, char* argv[]) {
         glUniformMatrix4fv(object_shader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
         box.Render();
 
-	/* Set the model shader to position the lamp away from the cube in the center */
+        /* Set the model shader to position the lamp away from the cube in the center */
         model = glm::mat4();
-	model = glm::translate(model, glm::vec3(1.2f, 1.0f, 2.0f));
-	model = glm::scale(model, glm::vec3(0.5f));
+        model = glm::translate(model, light_pos);
+        model = glm::scale(model, glm::vec3(0.5f));
 
-	/* Set lamp shader uniforms and draw the lamp object */
+        /* Set lamp shader uniforms and draw the lamp object */
         lamp_shader.Use();
         glUniformMatrix4fv(lamp_shader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
         glUniformMatrix4fv(lamp_shader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
