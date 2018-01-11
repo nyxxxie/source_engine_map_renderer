@@ -24,31 +24,29 @@
  */
 
 #include <string>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include "shader.h"
 
 
-Shader::Shader(const std::string& vertex_shader_path,
-               const std::string& fragment_shader_path) {
+Shader::Shader(const std::string& glsl_path) {
     GLuint vertex_shader, fragment_shader;
-    std::ifstream vertex_src, fragment_src;
+    std::stringstream glsl_stream;
+    std::ifstream glsl_file(glsl_path);
     char infolog[512];
     GLint success;
 
     /* Open vertex shader file */
-    std::ifstream vertex_shader_file(vertex_shader_path);
-    if (!vertex_shader_file.good()) {
-        throw ShaderException("Failed to find vertex shader file at "
-                              + vertex_shader_path);
+    if (!glsl_file.good()) {
+        throw ShaderException("Failed to find glsl file at " + glsl_path);
     }
-    std::stringstream vertex_shader_stream;
-    vertex_shader_stream << vertex_shader_file.rdbuf();
-    std::string vertex_shader_src = vertex_shader_stream.str();
-    vertex_shader_file.close();
+    glsl_stream << glsl_file.rdbuf();
+    std::string glsl_src = glsl_stream.str();
+    glsl_file.close();
 
     /* Compile vertex shader */
-    vertex_shader = CreateShaderFromString(vertex_shader_src.c_str(),
+    vertex_shader = CreateShaderFromString(glsl_src.c_str(),
 		    			   GL_VERTEX_SHADER,
 					   infolog, sizeof(infolog));
     if (!vertex_shader) {
@@ -56,19 +54,8 @@ Shader::Shader(const std::string& vertex_shader_path,
                               + std::string(infolog));
     }
 
-    /* Open fragment shader file */
-    std::ifstream fragment_shader_file(fragment_shader_path);
-    if (!fragment_shader_file.good()) {
-        throw ShaderException("Failed to find fragment shader file at "
-                              + fragment_shader_path);
-    }
-    std::stringstream fragment_shader_stream;
-    fragment_shader_stream << fragment_shader_file.rdbuf();
-    std::string fragment_shader_src = fragment_shader_stream.str();
-    fragment_shader_file.close();
-
     /* Fragment vertex shader */
-    fragment_shader = CreateShaderFromString(fragment_shader_src.c_str(),
+    fragment_shader = CreateShaderFromString(glsl_src.c_str(),
 		    			     GL_FRAGMENT_SHADER,
                                              infolog, sizeof(infolog));
     if (!fragment_shader) {
@@ -142,6 +129,22 @@ GLuint Shader::CreateShaderFromString(std::string shader_src, GLenum shadertype,
 				      char* infolog, const size_t infolog_size) {
     GLuint shader_id;
     GLint success;
+
+    /* Prepend appropriate preprocessor definition to compile the proper shader
+       in the file */
+    switch(shadertype) {
+    case GL_VERTEX_SHADER:
+        shader_src = std::string("#define VERTEX_SHADER\n") + shader_src;
+        break;
+    case GL_FRAGMENT_SHADER:
+        shader_src = std::string("#define FRAGMENT_SHADER\n") + shader_src;
+        break;
+    }
+
+    /* Prepend shader version */
+    // TODO: keep this in the glsl files, find a good way to insert the above
+    //       preprocessor definitions after the version declaration line
+    shader_src = std::string("#version 330 core\n") + shader_src;
 
     /* Create vertex shader */
     const char* src = shader_src.c_str();
