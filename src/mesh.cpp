@@ -52,18 +52,18 @@ Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint>
         vertex_data.push_back(it->position.y);
         vertex_data.push_back(it->position.z);
 
-	if (it->has_texture_coords) {
+        if (it->has_texture_coords) {
             has_texture_coords = true;
             vertex_data.push_back(it->texture_coords.x);
             vertex_data.push_back(it->texture_coords.y);
-	}
+        }
 
-	if (it->has_normal) {
+        if (it->has_normal) {
             has_normal = true;
             vertex_data.push_back(it->normal.x);
             vertex_data.push_back(it->normal.y);
             vertex_data.push_back(it->normal.z);
-	}
+        }
     }
 
     if (has_indices) {
@@ -76,15 +76,15 @@ Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint>
     stride = (3 * sizeof(GLfloat));
     base_offset = (3 * sizeof(GLfloat));
     pos_offset = 0;
-    if (has_normal) {
-        normal_offset = base_offset;
-	base_offset += (3 * sizeof(GLfloat));
-        stride += (3 * sizeof(GLfloat));
-    }
     if (has_texture_coords) {
         texture_coords_offset = base_offset;
-	base_offset += 2 * sizeof(GLfloat);
+        base_offset += 2 * sizeof(GLfloat);
         stride += 2 * sizeof(GLfloat);
+    }
+    if (has_normal) {
+        normal_offset = base_offset;
+        base_offset += (3 * sizeof(GLfloat));
+        stride += (3 * sizeof(GLfloat));
     }
 
     /* Create the vertex object array that'll store the mesh render info */
@@ -95,7 +95,7 @@ Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint>
     glGenBuffers(1, &vertex_data_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_data_buffer);
     glBufferData(GL_ARRAY_BUFFER, vertex_data.size() * sizeof(GLfloat),
-		 vertex_data.data(), GL_STATIC_DRAW);
+                 vertex_data.data(), GL_STATIC_DRAW);
 
     /* Create a buffer object to store vertex data in */
     if (has_indices) {
@@ -119,7 +119,7 @@ Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint>
     /* Enable and define texture coordinates vertex attribute */
     if (has_normal) {
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)normal_offset);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)normal_offset);
     }
 
     /* Unbind the vertex array object and our data buffer since we're done
