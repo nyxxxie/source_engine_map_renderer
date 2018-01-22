@@ -47,8 +47,8 @@ Shader::Shader(const std::string& glsl_path) {
 
     /* Compile vertex shader */
     vertex_shader = CreateShaderFromString(glsl_src.c_str(),
-		    			   GL_VERTEX_SHADER,
-					   infolog, sizeof(infolog));
+                                           GL_VERTEX_SHADER,
+                                           infolog, sizeof(infolog));
     if (!vertex_shader) {
         throw ShaderException("Failed to compile vertex shader: "
                               + std::string(infolog));
@@ -56,7 +56,7 @@ Shader::Shader(const std::string& glsl_path) {
 
     /* Fragment vertex shader */
     fragment_shader = CreateShaderFromString(glsl_src.c_str(),
-		    			     GL_FRAGMENT_SHADER,
+                                             GL_FRAGMENT_SHADER,
                                              infolog, sizeof(infolog));
     if (!fragment_shader) {
         throw ShaderException("Failed to compile fragment shader: "
@@ -111,22 +111,43 @@ GLint Shader::GetUniformLocation(const std::string& name, bool except) {
 /**
  *
  */
-void Shader::SetUniform(const std::string& name, GLint value) {
+void Shader::SetInt(const std::string& name, GLint value) {
     glUniform1i(GetUniformLocation(name), value);
 }
 
 /**
  *
  */
-void Shader::SetUniform(const std::string& name, GLfloat value) {
+void Shader::SetFloat(const std::string& name, GLfloat value) {
     glUniform1f(GetUniformLocation(name), value);
 }
 
 /**
  *
  */
+void Shader::SetVec3(const std::string& name, GLfloat x, GLfloat y, GLfloat z) {
+    glUniform3f(GetUniformLocation(name), x, y, z);
+}
+
+/**
+ *
+ */
+void Shader::SetVec4(const std::string& name, GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
+    glUniform4f(GetUniformLocation(name), x, y, z, w);
+}
+
+/**
+ *
+ */
+void Shader::SetMat4(const std::string& name, const glm::mat4& mat, GLboolean transpose) {
+    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(mat));
+}
+
+/**
+ *
+ */
 GLuint Shader::CreateShaderFromString(std::string shader_src, GLenum shadertype,
-				      char* infolog, const size_t infolog_size) {
+                      char* infolog, const size_t infolog_size) {
     GLuint shader_id;
     GLint success;
 

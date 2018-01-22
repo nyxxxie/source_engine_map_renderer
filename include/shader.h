@@ -30,6 +30,7 @@
 #include <exception>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class ShaderException : public std::exception {
 public:
@@ -52,8 +53,11 @@ public:
     void Use();
     GLuint id();
     GLint GetUniformLocation(const std::string& name, bool except=true);
-    void SetUniform(const std::string& name, GLint value);
-    void SetUniform(const std::string& name, GLfloat value);
+    void SetInt(const std::string& name, GLint value);
+    void SetFloat(const std::string& name, GLfloat value);
+    void SetVec3(const std::string& name, GLfloat x, GLfloat y, GLfloat z);
+    void SetVec4(const std::string& name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+    void SetMat4(const std::string& name, const glm::mat4& mat, GLboolean transpose=GL_FALSE);
 
 private:
     GLuint program_id;

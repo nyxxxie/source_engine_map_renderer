@@ -29,7 +29,6 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <GLFW/glfw3.h>
 #include "camera.h"
 #include "shader.h"
@@ -201,7 +200,7 @@ int main(int argc, char* argv[]) {
 
     /* Draw in wireframe mode */
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
- 
+
     /* Start render loop! */
     printf("Rendering started.\n");
     while (!glfwWindowShouldClose(window)) {
@@ -221,10 +220,10 @@ int main(int argc, char* argv[]) {
         object_shader.Use();
         light_pos.x = cos(glfwGetTime()) * 1.5f;
         light_pos.z = sin(glfwGetTime()) * 1.5f;
-        glUniform3f(object_shader.GetUniformLocation("object_color"), 1.0f, 0.5f, 0.31f);
-        glUniform3f(object_shader.GetUniformLocation("light_color"), 1.0f, 1.0f, 1.0f);
-        glUniform3f(object_shader.GetUniformLocation("light_pos"), light_pos.x, light_pos.y, light_pos.z);
-        glUniform3f(object_shader.GetUniformLocation("view_pos"), camera.pos.x, camera.pos.y, camera.pos.z);
+        object_shader.SetVec3("object_color", 1.0f, 0.5f, 0.31f);
+        object_shader.SetVec3("light_color", 1.0f, 1.0f, 1.0f);
+        object_shader.SetVec3("light_pos", light_pos.x, light_pos.y, light_pos.z);
+        object_shader.SetVec3("view_pos", camera.pos.x, camera.pos.y, camera.pos.z);
 
         /* Create the model, view, and projection transformation matricies */
         glm::mat4 projection = glm::perspective(glm::radians(CAMERA_FOV),
@@ -235,9 +234,9 @@ int main(int argc, char* argv[]) {
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
         /* Set light shader uniforms and draw the light object */
-        glUniformMatrix4fv(object_shader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(object_shader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(object_shader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+        object_shader.SetMat4("projection", projection);
+        object_shader.SetMat4("view", view);
+        object_shader.SetMat4("model", model);
         box.Render();
 
         /* Set the model shader to position the lamp away from the cube in the center */
@@ -247,9 +246,9 @@ int main(int argc, char* argv[]) {
 
         /* Set lamp shader uniforms and draw the lamp object */
         lamp_shader.Use();
-        glUniformMatrix4fv(lamp_shader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(lamp_shader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(lamp_shader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+        lamp_shader.SetMat4("projection", projection);
+        lamp_shader.SetMat4("view", view);
+        lamp_shader.SetMat4("model", model);
         box.Render();
 
         /* Check and call events and swap the buffers */
