@@ -208,6 +208,8 @@ int main(int argc, char* argv[]) {
         float current_frame = glfwGetTime();
         delta_time = current_frame - last_frame;
         last_frame = current_frame;
+        light_pos.x = cos(glfwGetTime()) * 1.5f;
+        light_pos.z = sin(glfwGetTime()) * 1.5f;
 
         /* Process keyboard input */
         process_input(window);
@@ -218,10 +220,6 @@ int main(int argc, char* argv[]) {
 
         /* set the lighting shader's color */
         object_shader.Use();
-        light_pos.x = cos(glfwGetTime()) * 1.5f;
-        light_pos.z = sin(glfwGetTime()) * 1.5f;
-        object_shader.SetVec3("light_color", 1.0f, 1.0f, 1.0f);
-        object_shader.SetVec3("light_pos", light_pos.x, light_pos.y, light_pos.z);
         object_shader.SetVec3("view_pos", camera.pos.x, camera.pos.y, camera.pos.z);
 
         /* Set shader material */
@@ -229,6 +227,20 @@ int main(int argc, char* argv[]) {
         object_shader.SetVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
         object_shader.SetVec3("material.specular", 0.5f, 0.5f, 0.5f);
         object_shader.SetFloat("material.shininess", 32.0f);
+
+        /* Set shader light settings */
+        glm::vec3 light_color;
+        light_color.x = sin(glfwGetTime() * 2.0f);
+        light_color.y = sin(glfwGetTime() * 0.7f);
+        light_color.z = sin(glfwGetTime() * 1.3f);
+
+        glm::vec3 ambient_color = light_color * glm::vec3(0.5f);
+        glm::vec3 diffuse_color = light_color * glm::vec3(0.2f);
+
+        object_shader.SetVec3("light.ambient",  ambient_color);
+        object_shader.SetVec3("light.diffuse",  diffuse_color);
+        object_shader.SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        object_shader.SetVec3("light.pos", light_pos.x, light_pos.y, light_pos.z);
 
         /* Create the model, view, and projection transformation matricies */
         glm::mat4 projection = glm::perspective(glm::radians(CAMERA_FOV),

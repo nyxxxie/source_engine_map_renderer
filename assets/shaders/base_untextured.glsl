@@ -36,9 +36,17 @@ struct Material {
 };
 uniform Material material;
 
-// Lighting coloring
-uniform vec3 light_color;
-uniform vec3 light_pos;
+// Light stuff
+struct Light {
+    vec3 pos;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+uniform Light light;
+
+// Misc inputs
 uniform vec3 view_pos;
 
 // Color that will be assigned to the fragment this shader is processing
@@ -47,20 +55,20 @@ out vec4 final_color;
 void main() {
     /* Calculate some intermediate components to lighting math */
     vec3 norm = normalize(normal);
-    vec3 light_dir = normalize(light_pos - frag_pos);
+    vec3 light_dir = normalize(light.pos - frag_pos);
     vec3 view_dir = normalize(view_pos - frag_pos);
     vec3 reflect_dir = reflect(-light_dir, norm);
 
     /* Calc ambient lighting component */
-    vec3 ambient = light_color * material.ambient;
+    vec3 ambient = light.ambient * material.ambient;
 
     /* Calc diffuse lighting component */
     float diff = max(dot(norm, light_dir), 0.0);
-    vec3 diffuse = light_color * (diff * material.diffuse);
+    vec3 diffuse = light.diffuse * (diff * material.diffuse);
 
     /* Calc specular lighting component */
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess);
-    vec3 specular = light_color * (spec * material.specular);
+    vec3 specular = light.specular * (spec * material.specular);
 
     /* Determine final color */
     final_color = vec4(ambient + diffuse + specular, 1.0);
