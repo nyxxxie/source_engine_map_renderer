@@ -27,17 +27,22 @@ void main() {
 in vec3 normal;
 in vec3 frag_pos;
 
+// Material stuff
+struct Material {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+};
+uniform Material material;
+
 // Lighting coloring
-uniform vec3 object_color;
 uniform vec3 light_color;
 uniform vec3 light_pos;
 uniform vec3 view_pos;
 
 // Color that will be assigned to the fragment this shader is processing
 out vec4 final_color;
-
-const float ambient_strength = 0.1;
-const float specular_strength = 0.5;
 
 void main() {
     /* Calculate some intermediate components to lighting math */
@@ -46,14 +51,18 @@ void main() {
     vec3 view_dir = normalize(view_pos - frag_pos);
     vec3 reflect_dir = reflect(-light_dir, norm);
 
-    /* Calc light components */
-    vec3 ambient = ambient_strength * light_color;
-    vec3 diffuse = light_color * max(dot(norm, light_dir), 0.0);
-    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
-    vec3 specular = specular_strength * light_color * spec;
-    vec3 face_lighting = ambient + diffuse + specular;
+    /* Calc ambient lighting component */
+    vec3 ambient = light_color * material.ambient;
+
+    /* Calc diffuse lighting component */
+    float diff = max(dot(norm, light_dir), 0.0);
+    vec3 diffuse = light_color * (diff * material.diffuse);
+
+    /* Calc specular lighting component */
+    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess);
+    vec3 specular = light_color * (spec * material.specular);
 
     /* Determine final color */
-    final_color = vec4(object_color * face_lighting, 1.0);
+    final_color = vec4(ambient + diffuse + specular, 1.0);
 }
 #endif

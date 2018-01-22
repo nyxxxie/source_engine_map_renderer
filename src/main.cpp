@@ -220,10 +220,15 @@ int main(int argc, char* argv[]) {
         object_shader.Use();
         light_pos.x = cos(glfwGetTime()) * 1.5f;
         light_pos.z = sin(glfwGetTime()) * 1.5f;
-        object_shader.SetVec3("object_color", 1.0f, 0.5f, 0.31f);
         object_shader.SetVec3("light_color", 1.0f, 1.0f, 1.0f);
         object_shader.SetVec3("light_pos", light_pos.x, light_pos.y, light_pos.z);
         object_shader.SetVec3("view_pos", camera.pos.x, camera.pos.y, camera.pos.z);
+
+        /* Set shader material */
+        object_shader.SetVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+        object_shader.SetVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+        object_shader.SetVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        object_shader.SetFloat("material.shininess", 32.0f);
 
         /* Create the model, view, and projection transformation matricies */
         glm::mat4 projection = glm::perspective(glm::radians(CAMERA_FOV),
