@@ -55,7 +55,9 @@ public:
     GLint GetUniformLocation(const std::string& name, bool except=true);
     void SetInt(const std::string& name, GLint value);
     void SetFloat(const std::string& name, GLfloat value);
+    void SetVec3(const std::string& name, const glm::vec3& vec);
     void SetVec3(const std::string& name, GLfloat x, GLfloat y, GLfloat z);
+    void SetVec4(const std::string& name, const glm::vec4& vec);
     void SetVec4(const std::string& name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
     void SetMat4(const std::string& name, const glm::mat4& mat, GLboolean transpose=GL_FALSE);
 

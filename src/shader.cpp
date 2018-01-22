@@ -125,8 +125,22 @@ void Shader::SetFloat(const std::string& name, GLfloat value) {
 /**
  *
  */
+void Shader::SetVec3(const std::string& name, const glm::vec3& vec) {
+    SetVec3(name, vec.x, vec.y, vec.z);
+}
+
+/**
+ *
+ */
 void Shader::SetVec3(const std::string& name, GLfloat x, GLfloat y, GLfloat z) {
     glUniform3f(GetUniformLocation(name), x, y, z);
+}
+
+/**
+ *
+ */
+void Shader::SetVec4(const std::string& name, const glm::vec4& vec) {
+    SetVec4(name, vec.x, vec.y, vec.z, vec.w);
 }
 
 /**
