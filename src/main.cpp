@@ -136,16 +136,18 @@ int main(int argc, char* argv[]) {
 
     /*  Register a callback to resize the draw space when the window changes */
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    
+
     /* Set input mode and user input event callbacks */
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetKeyCallback(window, key_callback);
 
+    Texture container_texture("./assets/textures/container2.png");
+
     /* Inform OpenGL we'd like to enable depth testing */
     glEnable(GL_DEPTH_TEST);
 
-    Shader object_shader("./assets/shaders/base_untextured.glsl");
+    Shader object_shader("./assets/shaders/base.glsl");
     Shader lamp_shader("./assets/shaders/lamp.glsl");
     Mesh box({
         /* Back */
@@ -196,6 +198,49 @@ int main(int argc, char* argv[]) {
         Vertex(-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f),
         Vertex(-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f)
     });
+    Mesh textured_box({
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.0f, -1.0f),
+        Vertex( 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, -1.0f),
+        Vertex( 0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.0f, -1.0f),
+        Vertex( 0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.0f, -1.0f),
+        Vertex(-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, -1.0f),
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.0f, -1.0f),
+
+        Vertex(-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.0f,  1.0f),
+        Vertex( 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f),
+        Vertex(-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f),
+        Vertex(-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.0f,  1.0f),
+
+        Vertex(-0.5f,  0.5f,  0.5f,  1.0f,  0.0f, -1.0f,  0.0f,  0.0f),
+        Vertex(-0.5f,  0.5f, -0.5f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f),
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f,  1.0f, -1.0f,  0.0f,  0.0f),
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f,  1.0f, -1.0f,  0.0f,  0.0f),
+        Vertex(-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f),
+        Vertex(-0.5f,  0.5f,  0.5f,  1.0f,  0.0f, -1.0f,  0.0f,  0.0f),
+
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  1.0f,  0.0f,  0.0f),
+        Vertex( 0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f),
+        Vertex( 0.5f, -0.5f, -0.5f,  0.0f,  1.0f,  1.0f,  0.0f,  0.0f),
+        Vertex( 0.5f, -0.5f, -0.5f,  0.0f,  1.0f,  1.0f,  0.0f,  0.0f),
+        Vertex( 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  1.0f,  0.0f,  0.0f),
+
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f,  1.0f,  0.0f, -1.0f,  0.0f),
+        Vertex( 0.5f, -0.5f, -0.5f,  1.0f,  1.0f,  0.0f, -1.0f,  0.0f),
+        Vertex( 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, -1.0f,  0.0f),
+        Vertex( 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, -1.0f,  0.0f),
+        Vertex(-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f, -1.0f,  0.0f),
+        Vertex(-0.5f, -0.5f, -0.5f,  0.0f,  1.0f,  0.0f, -1.0f,  0.0f),
+
+        Vertex(-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f),
+        Vertex( 0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f),
+        Vertex( 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f),
+        Vertex(-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  1.0f,  0.0f),
+        Vertex(-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f)
+    });
     glm::vec3 light_pos = glm::vec3(1.2f, 0.7f, 2.0f);
 
     /* Draw in wireframe mode */
@@ -218,27 +263,18 @@ int main(int argc, char* argv[]) {
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /* set the lighting shader's color */
+        /* Use shader and set basic shader options */
         object_shader.Use();
         object_shader.SetVec3("view_pos", camera.pos.x, camera.pos.y, camera.pos.z);
 
         /* Set shader material */
-        object_shader.SetVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-        object_shader.SetVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+        object_shader.SetInt("material.diffuse", 0);
         object_shader.SetVec3("material.specular", 0.5f, 0.5f, 0.5f);
         object_shader.SetFloat("material.shininess", 32.0f);
 
         /* Set shader light settings */
-        glm::vec3 light_color;
-        light_color.x = sin(glfwGetTime() * 2.0f);
-        light_color.y = sin(glfwGetTime() * 0.7f);
-        light_color.z = sin(glfwGetTime() * 1.3f);
-
-        glm::vec3 ambient_color = light_color * glm::vec3(0.5f);
-        glm::vec3 diffuse_color = light_color * glm::vec3(0.2f);
-
-        object_shader.SetVec3("light.ambient",  ambient_color);
-        object_shader.SetVec3("light.diffuse",  diffuse_color);
+        object_shader.SetVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+        object_shader.SetVec3("light.diffuse",  0.7f, 0.7f, 0.7f);
         object_shader.SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
         object_shader.SetVec3("light.pos", light_pos.x, light_pos.y, light_pos.z);
 
@@ -254,7 +290,8 @@ int main(int argc, char* argv[]) {
         object_shader.SetMat4("projection", projection);
         object_shader.SetMat4("view", view);
         object_shader.SetMat4("model", model);
-        box.Render();
+        container_texture.Use(GL_TEXTURE0);
+        textured_box.Render();
 
         /* Set the model shader to position the lamp away from the cube in the center */
         model = glm::mat4();
