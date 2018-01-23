@@ -34,7 +34,7 @@ in vec3 normal;
 // Material stuff
 struct Material {
     sampler2D diffuse;
-    vec3 specular;
+    sampler2D specular;
     float shininess;
 };
 uniform Material material;
@@ -62,15 +62,15 @@ void main() {
     vec3 reflect_dir = reflect(-light_dir, norm);
 
     /* Calc ambient lighting component */
-    vec3 ambient = light.ambient * vec3(texture(material.diffuse, vec2(tex_coords.x, tex_coords.y)));
+    vec3 ambient = light.ambient * vec3(texture(material.diffuse, tex_coords));
 
     /* Calc diffuse lighting component */
     float diff = max(dot(norm, light_dir), 0.0);
-    vec3 diffuse = light.diffuse * (diff * vec3(texture(material.diffuse, vec2(tex_coords.x, tex_coords.y))));
+    vec3 diffuse = light.diffuse * (diff * vec3(texture(material.diffuse, tex_coords)));
 
     /* Calc specular lighting component */
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess);
-    vec3 specular = light.specular * (spec * material.specular);
+    vec3 specular = light.specular * (spec * vec3(texture(material.specular, tex_coords)));
 
     /* Determine final color */
     final_color = vec4(ambient + diffuse + specular, 1.0);

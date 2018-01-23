@@ -143,6 +143,7 @@ int main(int argc, char* argv[]) {
     glfwSetKeyCallback(window, key_callback);
 
     Texture container_texture("./assets/textures/container2.png");
+    Texture container_texture_specular("./assets/textures/container2_specular.png");
 
     /* Inform OpenGL we'd like to enable depth testing */
     glEnable(GL_DEPTH_TEST);
@@ -269,7 +270,7 @@ int main(int argc, char* argv[]) {
 
         /* Set shader material */
         object_shader.SetInt("material.diffuse", 0);
-        object_shader.SetVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        object_shader.SetInt("material.specular", 1);
         object_shader.SetFloat("material.shininess", 32.0f);
 
         /* Set shader light settings */
@@ -291,6 +292,7 @@ int main(int argc, char* argv[]) {
         object_shader.SetMat4("view", view);
         object_shader.SetMat4("model", model);
         container_texture.Use(GL_TEXTURE0);
+        container_texture_specular.Use(GL_TEXTURE1);
         textured_box.Render();
 
         /* Set the model shader to position the lamp away from the cube in the center */
