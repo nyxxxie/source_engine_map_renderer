@@ -45,14 +45,12 @@ private:
 
 class Texture {
 public:
-    Texture(const std::string& texture_file, GLenum active_texture=GL_TEXTURE0,
-            GLenum format=GL_RGB, bool flip=false);
+    Texture(const std::string& texture_file, bool flip=false);
 
-    void Use();
+    void Use(GLenum active_texture=GL_TEXTURE0);
 
 private:
     GLuint texture;
-    GLenum active_texture;
     int width;
     int height;
     int channels;

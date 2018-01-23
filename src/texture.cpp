@@ -26,9 +26,7 @@
 #include "graphics/stb_image.h"
 
 
-Texture::Texture(const std::string& texture_file, GLenum active_texture,
-		 GLenum format, bool flip) {
-    this->active_texture = active_texture;
+Texture::Texture(const std::string& texture_file, bool flip) {
 
     /* Create and bind opengl texture object */
     glGenTextures(1, &texture);
@@ -49,13 +47,28 @@ Texture::Texture(const std::string& texture_file, GLenum active_texture,
 
     /* Load texture from image file */
     unsigned char* data = stbi_load(texture_file.c_str(), &width, &height,
-		                    &channels, 0);
+                                    &channels, 0);
     if (!data) {
         throw TextureException("Failed to load texture.");
     }
 
+    GLenum format;
+    switch(channels) {
+    case 1:
+        format = GL_RED;
+        break;
+    case 3:
+        format = GL_RGB;
+        break;
+    case 4:
+        format = GL_RGBA;
+        break;
+    default:
+        throw TextureException("Unknown number of channels: ");
+    }
+
     /* Load texture into GPU */
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
     /* Generate mipmaps */
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -64,7 +77,7 @@ Texture::Texture(const std::string& texture_file, GLenum active_texture,
     stbi_image_free(data);
 }
 
-void Texture::Use() {
+void Texture::Use(GLenum active_texture) {
     glActiveTexture(active_texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 }
