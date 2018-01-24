@@ -277,6 +277,9 @@ int main(int argc, char* argv[]) {
         object_shader.SetVec3("light.ambient",  0.2f, 0.2f, 0.2f);
         object_shader.SetVec3("light.diffuse",  0.7f, 0.7f, 0.7f);
         object_shader.SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        object_shader.SetFloat("light.constant", 1.0f);
+        object_shader.SetFloat("light.linear", 0.09);
+        object_shader.SetFloat("light.quadratic", 0.032f);
         object_shader.SetVec3("light.pos", light_pos.x, light_pos.y, light_pos.z);
 
         /* Create the model, view, and projection transformation matricies */
