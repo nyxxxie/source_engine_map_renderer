@@ -59,6 +59,7 @@ private:
     GLuint vertex_array_object;
     GLuint vertex_data_buffer;
     GLuint vertex_index_buffer;
+    GLenum draw_mode;
 };
 
 #endif // MESH_H

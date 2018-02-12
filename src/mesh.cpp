@@ -37,11 +37,14 @@ Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint>
     GLuint stride;
     unsigned long base_offset, pos_offset, normal_offset, texture_coords_offset;
 
+    /* Set default draw mode */
+    draw_mode = GL_TRIANGLES;
+
     /* Process the input indices into usable buffers */
     has_indices = false;
     for (const GLuint* it=indices.begin(); it != indices.end(); it++) {
         has_indices = true;
-	index_data.push_back(*it);
+        index_data.push_back(*it);
     }
 
     /* Process the input vertices into usable buffers */
@@ -135,8 +138,8 @@ Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<GLuint>
 void Mesh::Render() {
     glBindVertexArray(vertex_array_object);
     if (has_indices) {
-        glDrawElements(GL_TRIANGLES, draw_count, GL_UNSIGNED_INT, 0);
+        glDrawElements(draw_mode, draw_count, GL_UNSIGNED_INT, 0);
     } else {
-        glDrawArrays(GL_TRIANGLES, 0, draw_count);
+        glDrawArrays(draw_mode, 0, draw_count);
     }
 }
