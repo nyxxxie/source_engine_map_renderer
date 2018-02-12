@@ -37,8 +37,8 @@
 #include "vertex.h"
 #include "texture.h"
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1600
+#define WINDOW_HEIGHT 900
 #define CAMERA_FOV 45.0f
 
 Camera camera(glm::vec3(0.0f, 0.0f, 5.0f));
@@ -246,9 +246,11 @@ int main(int argc, char* argv[]) {
     glm::vec3 light_pos = glm::vec3(1.2f, 0.7f, 2.0f);
 
     /* Parse BSP file if one is provided */
+    Map* map = nullptr;
     if (argc >= 2) {
         printf("Parsing BSP file at \'%s\'\n", argv[1]);
         BSPParser parser(argv[1]);
+        map = parser.genMap();
     }
 
     /* Draw in wireframe mode */
@@ -268,54 +270,65 @@ int main(int argc, char* argv[]) {
         process_input(window);
 
         /* Set the color the screen will clear to and then clear it */
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /* Use shader and set basic shader options */
-        object_shader.Use();
-        object_shader.SetVec3("view_pos", camera.pos.x, camera.pos.y, camera.pos.z);
+        //* Use shader and set basic shader options */
+        //object_shader.Use();
+        //object_shader.SetVec3("view_pos", camera.pos.x, camera.pos.y, camera.pos.z);
 
-        /* Set shader material */
-        object_shader.SetInt("material.diffuse", 0);
-        object_shader.SetInt("material.specular", 1);
-        object_shader.SetFloat("material.shininess", 32.0f);
+        ///* Set shader material */
+        //object_shader.SetInt("material.diffuse", 0);
+        //object_shader.SetInt("material.specular", 1);
+        //object_shader.SetFloat("material.shininess", 32.0f);
 
-        /* Set shader light settings */
-        object_shader.SetVec3("light.ambient",  0.2f, 0.2f, 0.2f);
-        object_shader.SetVec3("light.diffuse",  0.7f, 0.7f, 0.7f);
-        object_shader.SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        object_shader.SetFloat("light.constant", 1.0f);
-        object_shader.SetFloat("light.linear", 0.09);
-        object_shader.SetFloat("light.quadratic", 0.032f);
-        object_shader.SetVec3("light.pos", light_pos.x, light_pos.y, light_pos.z);
+        ///* Set shader light settings */
+        //object_shader.SetVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+        //object_shader.SetVec3("light.diffuse",  0.7f, 0.7f, 0.7f);
+        //object_shader.SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        //object_shader.SetFloat("light.constant", 1.0f);
+        //object_shader.SetFloat("light.linear", 0.09);
+        //object_shader.SetFloat("light.quadratic", 0.032f);
+        //object_shader.SetVec3("light.pos", light_pos.x, light_pos.y, light_pos.z);
 
-        /* Create the model, view, and projection transformation matricies */
-        glm::mat4 projection = glm::perspective(glm::radians(CAMERA_FOV),
-                                                float(WINDOW_WIDTH)/WINDOW_HEIGHT,
-                                                0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 model = glm::mat4();
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        ///* Create the model, view, and projection transformation matricies */
+        //glm::mat4 projection = glm::perspective(glm::radians(CAMERA_FOV),
+        //                                        float(WINDOW_WIDTH)/WINDOW_HEIGHT,
+        //                                        0.1f, 100.0f);
+        //glm::mat4 view = camera.GetViewMatrix();
+        //glm::mat4 model = glm::mat4();
+        //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
-        /* Set light shader uniforms and draw the light object */
-        object_shader.SetMat4("projection", projection);
-        object_shader.SetMat4("view", view);
-        object_shader.SetMat4("model", model);
-        container_texture.Use(GL_TEXTURE0);
-        container_texture_specular.Use(GL_TEXTURE1);
-        textured_box.Render();
+        ///* Set light shader uniforms and draw the light object */
+        //object_shader.SetMat4("projection", projection);
+        //object_shader.SetMat4("view", view);
+        //object_shader.SetMat4("model", model);
+        //container_texture.Use(GL_TEXTURE0);
+        //container_texture_specular.Use(GL_TEXTURE1);
+        //textured_box.Render();
 
-        /* Set the model shader to position the lamp away from the cube in the center */
-        model = glm::mat4();
-        model = glm::translate(model, light_pos);
-        model = glm::scale(model, glm::vec3(0.5f));
+        ///* Set the model shader to position the lamp away from the cube in the center */
+        //model = glm::mat4();
+        //model = glm::translate(model, light_pos);
+        //model = glm::scale(model, glm::vec3(0.5f));
 
-        /* Set lamp shader uniforms and draw the lamp object */
-        lamp_shader.Use();
-        lamp_shader.SetMat4("projection", projection);
-        lamp_shader.SetMat4("view", view);
-        lamp_shader.SetMat4("model", model);
-        box.Render();
+        ///* Set lamp shader uniforms and draw the lamp object */
+        //lamp_shader.Use();
+        //lamp_shader.SetMat4("projection", projection);
+        //lamp_shader.SetMat4("view", view);
+        //lamp_shader.SetMat4("model", model);
+        //box.Render();
+
+        /* Draw map (if it exists) */
+        if (map != nullptr) {
+          glm::mat4 projection = glm::perspective(glm::radians(CAMERA_FOV),
+                                                  float(WINDOW_WIDTH)/WINDOW_HEIGHT,
+                                                  0.1f, 1000.0f);
+          glm::mat4 view = camera.GetViewMatrix();
+          glm::mat4 model = glm::mat4();
+          model = glm::scale(model, glm::vec3(0.01f));
+          map->render(model, view, projection);
+        }
 
         /* Check and call events and swap the buffers */
         glfwPollEvents();

@@ -22,6 +22,7 @@
  */
 
 #include <vector>
+#include <glm/glm.hpp>
 #include "mesh.h"
 
 
@@ -31,6 +32,15 @@
 class Map {
   public:
     Map();
+
+    void render(glm::mat4& model, glm::mat4& view, glm::mat4& projection);
+    void bake();
+    void addVertex(glm::vec3& vector);
+
   private:
-    std::vector<Mesh> faces;
+    Shader* shader;
+    GLuint vertex_array_object;
+    GLuint vertex_data_buffer;
+
+    std::vector<glm::vec3> points;
 };

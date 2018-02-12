@@ -46,6 +46,17 @@ BSPParser::BSPParser(std::string path) {
   delete data;  // TODO: delete data if an exception occurs and forward it
 }
 
+Map* BSPParser::genMap() {
+  Map* map = new Map();
+
+  for (glm::vec3 point : vertices) {
+    map->addVertex(point);
+  }
+
+  map->bake();
+  return map;
+}
+
 void BSPParser::processHeader(uint8_t* data, size_t data_len) {
   bsp_header_t* header;
 
@@ -171,8 +182,8 @@ void BSPParser::processLump(uint8_t* data, size_t data_len, uint32_t lump_type, 
 }
 
 void BSPParser::processVertexLump(uint8_t* data, size_t data_len, bsp_lump_t* lump) {
-  bsp_vertex_t* vertices;
-  size_t number_vertices;
+  bsp_vertex_t* verts;
+  size_t number_verts;
 
   printf("Processing vertex lump...\n");
 
@@ -182,26 +193,32 @@ void BSPParser::processVertexLump(uint8_t* data, size_t data_len, bsp_lump_t* lu
   }
 
   /* Sanity check more values */
-  if ((lump->size % sizeof(*vertices)) != 0) {
+  if ((lump->size % sizeof(*verts)) != 0) {
     throw BSPParserException("Vertex lumps are uneven");
   }
 
-  vertices = (bsp_vertex_t*)(data + lump->file_offset);
-  number_vertices = lump->size / sizeof(*vertices);
+  /* */
+  verts = (bsp_vertex_t*)(data + lump->file_offset);
+  number_verts = lump->size / sizeof(*verts);
 
-  for (int i=0; i < number_vertices; i++) {
-    printf("\t VERTEX: %f %f %f\n", vertices[i].x, vertices[i].y, vertices[i].z);
+  /* */
+  for (int i=0; i < number_verts; i++) {
+    //printf("\t VERTEX: %f %f %f\n", verts[i].x, verts[i].y, verts[i].z);
+    vertices.push_back({ verts[i].x, verts[i].y, verts[i].z });
   }
 }
 
 void BSPParser::processEdgeLump(uint8_t* data, size_t data_len, bsp_lump_t* lump) {
 
+  printf("Processing edge lump...\n");
 }
 
 void BSPParser::processSurfedgeLump(uint8_t* data, size_t data_len, bsp_lump_t* lump) {
 
+  printf("Processing surfedge lump...\n");
 }
 
 void BSPParser::processFaceLump(uint8_t* data, size_t data_len, bsp_lump_t* lump) {
 
+  printf("Processing face lump...\n");
 }

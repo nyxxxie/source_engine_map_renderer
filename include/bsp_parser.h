@@ -24,8 +24,9 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <glm/glm.hpp>
 #include "bsp_file.h"
-#include "mesh.h"
+#include "map.h"
 
 
 /**
@@ -53,8 +54,10 @@ class BSPParser {
   public:
     BSPParser(std::string path);
 
+    Map* genMap();
+
   private:
-    std::vector<bsp_vertex_t> vectors;
+    std::vector<glm::vec3> vertices;
     std::vector<bsp_edge_t> edges;
     std::vector<bsp_surfedge_t> surfedges;
     std::vector<bsp_face_t> faces;

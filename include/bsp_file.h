@@ -98,6 +98,7 @@
 #define LUMP_OVERLAY_FADES 62
 #define LUMP_DISP_MULTIBLEND 63
 
+
 struct bsp_lump_t {
   uint32_t file_offset;  // Where this lump's data is located
   uint32_t size;  // How much space this lump takes up
