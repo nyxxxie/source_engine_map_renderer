@@ -118,13 +118,13 @@ struct bsp_vertex_t {
   float z;
 } __attribute__((packed));
 
-typedef struct bsp_edge_t {
+struct bsp_edge_t {
   uint16_t v[2];
 } __attribute__((packed));
 
 typedef int32_t bsp_surfedge_t;
 
-typedef struct bsp_face_t {
+struct bsp_face_t {
   uint16_t plane_index;
   uint8_t side;
   uint8_t on_node;  //
