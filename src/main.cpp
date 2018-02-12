@@ -30,6 +30,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
+#include "bsp_parser.h"
 #include "camera.h"
 #include "shader.h"
 #include "mesh.h"
@@ -243,6 +244,12 @@ int main(int argc, char* argv[]) {
         Vertex(-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f)
     });
     glm::vec3 light_pos = glm::vec3(1.2f, 0.7f, 2.0f);
+
+    /* Parse BSP file if one is provided */
+    if (argc >= 2) {
+        printf("Parsing BSP file at \'%s\'\n", argv[1]);
+        BSPParser parser(argv[1]);
+    }
 
     /* Draw in wireframe mode */
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
