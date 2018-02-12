@@ -190,7 +190,7 @@ void BSPParser::processVertexLump(uint8_t* data, size_t data_len, bsp_lump_t* lu
   number_vertices = lump->size / sizeof(*vertices);
 
   for (int i=0; i < number_vertices; i++) {
-    //printf("\t VERTEX: %f %f %f\n", vertices[i].x, vertices[i].y, vertices[i].z);
+    printf("\t VERTEX: %f %f %f\n", vertices[i].x, vertices[i].y, vertices[i].z);
   }
 }
 
