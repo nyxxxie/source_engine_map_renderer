@@ -326,7 +326,9 @@ int main(int argc, char* argv[]) {
                                                   0.1f, 1000.0f);
           glm::mat4 view = camera.GetViewMatrix();
           glm::mat4 model = glm::mat4();
-          model = glm::scale(model, glm::vec3(0.01f));
+          model = glm::scale(model, glm::vec3(0.005f));
+          model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+          model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
           map->render(model, view, projection);
         }
 
