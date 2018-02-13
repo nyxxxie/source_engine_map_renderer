@@ -63,6 +63,6 @@ void Map::bake() {
 }
 
 void Map::addVertex(glm::vec3& point) {
-  printf("Point added: %f %f %f\n", point.x, point.y, point.z);
+  //printf("Point added: %f %f %f\n", point.x, point.y, point.z);
   points.push_back(glm::vec3(point));
 }
