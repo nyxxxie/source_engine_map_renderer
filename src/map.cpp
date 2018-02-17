@@ -31,7 +31,7 @@ Map::Map() {
   vertex_data_buffer = -1;
 }
 
-void Map::render(glm::mat4& model, glm::mat4& view, glm::mat4& projection) {
+void Map::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) {
   shader->Use();
   shader->SetMat4("projection", projection);
   shader->SetMat4("view", view);
@@ -62,7 +62,7 @@ void Map::bake() {
   glBindVertexArray(0);
 }
 
-void Map::addVertex(glm::vec3& point) {
+void Map::addVertex(const glm::vec3& point) {
   //printf("Point added: %f %f %f\n", point.x, point.y, point.z);
   points.push_back(glm::vec3(point));
 }

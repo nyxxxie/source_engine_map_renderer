@@ -33,9 +33,9 @@ class Map {
   public:
     Map();
 
-    void render(glm::mat4& model, glm::mat4& view, glm::mat4& projection);
+    void render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection);
     void bake();
-    void addVertex(glm::vec3& vector);
+    void addVertex(const glm::vec3& vector);
 
   private:
     Shader* shader;
