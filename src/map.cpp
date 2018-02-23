@@ -35,7 +35,7 @@ MapFace::MapFace(std::vector<uint16_t>& indices) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_bo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, (size_t)(indices.size() * sizeof(uint16_t)),
                  indices.data(), GL_STATIC_DRAW);
-    index_amt = (indices.end() - indices.begin()) / sizeof(uint32_t);
+    index_amt = indices.size();
 
     /* Set the attrib pointer to point to our point info */
     glEnableVertexAttribArray(0);
