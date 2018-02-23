@@ -21,6 +21,9 @@
  *
  */
 
+#ifndef BSP_FILE_H
+#define BSP_FILE_H
+
 #define BSP_FILE_IDENTIFIER	(('P' << 24) + ( 'S' << 16) + ('B' << 8) + 'V')
 #define BSP_TOTAL_LUMPS 64
 
@@ -144,3 +147,5 @@ struct bsp_face_t {
   uint16_t first_primitive;
   uint32_t smoothing_groups;
 } __attribute__((packed));
+
+#endif // BSP_FILE_H
