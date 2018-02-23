@@ -21,9 +21,32 @@
  *
  */
 
+#ifndef MAP_H
+#define MAP_H
+
 #include <vector>
+#include <initializer_list>
 #include <glm/glm.hpp>
 #include "mesh.h"
+
+class BSPParser;
+
+
+/**
+ *
+ */
+class MapFace {
+  public:
+    MapFace(std::vector<uint16_t>& indices);
+
+    void render();
+
+  private:
+    /* Opengl objects */
+    GLuint vao;
+    GLuint element_bo;
+    size_t index_amt;
+};
 
 
 /**
@@ -34,13 +57,13 @@ class Map {
     Map();
 
     void render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection);
-    void bake();
-    void addVertex(const glm::vec3& vector);
+    void FromBSP(BSPParser* parser);
 
   private:
     Shader* shader;
-    GLuint vertex_array_object;
-    GLuint vertex_data_buffer;
+    GLuint vertex_bo;
 
-    std::vector<glm::vec3> points;
+    std::vector<MapFace> faces;
 };
+
+#endif // MAP_H

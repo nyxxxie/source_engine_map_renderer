@@ -54,14 +54,12 @@ class BSPParser {
   public:
     BSPParser(std::string path);
 
-    Map* genMap();
-
-  private:
     std::vector<glm::vec3> vertices;
-    std::vector<bsp_edge_t> edges;
-    std::vector<bsp_surfedge_t> surfedges;
-    std::vector<bsp_face_t> faces;
+    std::vector<bsp_edge_t> map_edges;
+    std::vector<bsp_surfedge_t> map_surfedges;
+    std::vector<bsp_face_t> map_faces;
 
+ private:
     void processHeader(uint8_t* data, size_t data_len);
     void processLump(uint8_t* data, size_t data_len, uint32_t lump_type, bsp_lump_t* lump);
     void processVertexLump(uint8_t* data, size_t data_len, bsp_lump_t* lump);

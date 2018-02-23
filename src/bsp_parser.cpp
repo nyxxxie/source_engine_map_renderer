@@ -46,17 +46,6 @@ BSPParser::BSPParser(std::string path) {
   delete data;  // TODO: delete data if an exception occurs and forward it
 }
 
-Map* BSPParser::genMap() {
-  Map* map = new Map();
-
-  for (glm::vec3 point : vertices) {
-    map->addVertex(point);
-  }
-
-  map->bake();
-  return map;
-}
-
 void BSPParser::processHeader(uint8_t* data, size_t data_len) {
   bsp_header_t* header;
 
@@ -209,16 +198,79 @@ void BSPParser::processVertexLump(uint8_t* data, size_t data_len, bsp_lump_t* lu
 }
 
 void BSPParser::processEdgeLump(uint8_t* data, size_t data_len, bsp_lump_t* lump) {
+  bsp_edge_t* edges;
+  size_t number_edges;
 
   printf("Processing edge lump...\n");
+
+  /* Make sure edge values look ok */
+  if (data_len < lump->file_offset + lump->size) {
+      throw BSPParserException("Edge lump doesn't seem to fit in the data buffer?");
+  }
+
+  /* Sanity check more values */
+  if ((lump->size % sizeof(*edges)) != 0) {
+      throw BSPParserException("Edge lumps are uneven");
+  }
+
+  /* */
+  edges = (bsp_edge_t*)(data + lump->file_offset);
+  number_edges = lump->size / sizeof(*edges);
+
+
+  for (int i=0; i < number_edges; i++) {
+      map_edges.push_back(edges[i]);
+  }
 }
 
 void BSPParser::processSurfedgeLump(uint8_t* data, size_t data_len, bsp_lump_t* lump) {
+    bsp_surfedge_t* surfedges;
+    size_t number_surfedges;
 
-  printf("Processing surfedge lump...\n");
+    printf("Processing surfedge lump...\n");
+
+    /* Make sure edge values look ok */
+    if (data_len < lump->file_offset + lump->size) {
+        throw BSPParserException("Surfedge lump doesn't seem to fit in the data buffer?");
+    }
+
+    /* Sanity check more values */
+    if ((lump->size % sizeof(*surfedges)) != 0) {
+        throw BSPParserException("Surfedge lumps are uneven");
+    }
+
+    /* */
+    surfedges = (bsp_surfedge_t*)(data + lump->file_offset);
+    number_surfedges = lump->size / sizeof(*surfedges);
+
+
+    for (int i=0; i < number_surfedges; i++) {
+        map_surfedges.push_back(surfedges[i]);
+    }
 }
 
 void BSPParser::processFaceLump(uint8_t* data, size_t data_len, bsp_lump_t* lump) {
+    bsp_face_t* faces;
+    size_t number_faces;
 
-  printf("Processing face lump...\n");
+    printf("Processing face lump...\n");
+
+    /* Make sure edge values look ok */
+    if (data_len < lump->file_offset + lump->size) {
+        throw BSPParserException("Face lump doesn't seem to fit in the data buffer?");
+    }
+
+    /* Sanity check more values */
+    if ((lump->size % sizeof(*faces)) != 0) {
+        throw BSPParserException("Face lumps are uneven");
+    }
+
+    /* */
+    faces = (bsp_face_t*)(data + lump->file_offset);
+    number_faces = lump->size / sizeof(*faces);
+
+
+    for (int i=0; i < number_faces; i++) {
+        map_faces.push_back(faces[i]);
+    }
 }

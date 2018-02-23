@@ -23,12 +23,37 @@
 
 #include <stdio.h>
 #include "map.h"
+#include "bsp_parser.h"
 
+MapFace::MapFace(std::vector<uint16_t>& indices) {
+    /* Create the vertex object array that'll store the mesh render info */
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    /* Create a buffer object to store vertex data in */
+    glGenBuffers(1, &element_bo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_bo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (size_t)(indices.size() * sizeof(uint16_t)),
+                 indices.data(), GL_STATIC_DRAW);
+    index_amt = (indices.end() - indices.begin()) / sizeof(uint32_t);
+
+    /* Set the attrib pointer to point to our point info */
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), (void*)0);
+
+    /* Unbind the data buffer and the vertex array */
+    glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void MapFace::render() {
+    glBindVertexArray(vao);
+    glDrawElements(GL_TRIANGLES, index_amt, GL_UNSIGNED_SHORT, 0);
+}
 
 Map::Map() {
   shader = nullptr;
-  vertex_array_object = -1;
-  vertex_data_buffer = -1;
+  vertex_bo = -1;
 }
 
 void Map::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) {
@@ -36,33 +61,51 @@ void Map::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4&
   shader->SetMat4("projection", projection);
   shader->SetMat4("view", view);
   shader->SetMat4("model", model);
-  glBindVertexArray(vertex_array_object);
-  glDrawArrays(GL_POINTS, 0, points.size());
+
+  for (MapFace face : faces) {
+      face.render();
+  }
 }
 
-void Map::bake() {
+void Map::FromBSP(BSPParser* parser) {
   shader = new Shader("./assets/shaders/point_cloud.glsl");
 
-  /* Create the vertex object array that'll store the mesh render info */
-  glGenVertexArrays(1, &vertex_array_object);
-  glBindVertexArray(vertex_array_object);
-
   /* Create a buffer object to store vertex data in */
-  glGenBuffers(1, &vertex_data_buffer);
-  glBindBuffer(GL_ARRAY_BUFFER, vertex_data_buffer);
-  glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(glm::vec3),
-               points.data(), GL_STATIC_DRAW);
+  glGenBuffers(1, &vertex_bo);
+  glBindBuffer(GL_ARRAY_BUFFER, vertex_bo);
+  glBufferData(GL_ARRAY_BUFFER, parser->vertices.size() * sizeof(glm::vec3),
+               parser->vertices.data(), GL_STATIC_DRAW);
 
-  /* Set the attrib pointer to point to our point info */
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), (void*)0);
+  /* Create faces */
+  for (bsp_face_t face : parser->map_faces) {
+      /* Extract each point in the edge */
+      std::vector<uint16_t> points;
+      for (int i=0; i < face.num_edges; i++) {
+          uint16_t edge1;
+          uint16_t edge2;
 
-  /* Unbind the data buffer and the vertex array */
+          bsp_surfedge_t surfedge = parser->map_surfedges[face.first_edge + i];
+          bsp_edge_t edge = parser->map_edges[abs(surfedge)];
+          if (surfedge < 0) {
+              edge1 = edge.v[0];
+              edge2 = edge.v[1];
+          } else {
+              edge1 = edge.v[1];
+              edge2 = edge.v[0];
+          }
+
+          /* Add the point indices to the array */
+          // TODO: if we have problems, we can just create a vbo for each face
+          //       instead of doing this complicated element crap.  More space
+          //       will be taken up in gpu memory, but we'll at least be able to
+          //       verify that the face system works as expected
+          points.push_back(edge1);
+          points.push_back(edge2);
+      }
+
+      faces.push_back(MapFace(points));
+  }
+
+  /* Unbind the vertex buffer */
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-}
-
-void Map::addVertex(const glm::vec3& point) {
-  //printf("Point added: %f %f %f\n", point.x, point.y, point.z);
-  points.push_back(glm::vec3(point));
 }
