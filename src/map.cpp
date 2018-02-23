@@ -80,11 +80,11 @@ void Map::FromBSP(BSPParser* parser) {
   for (bsp_face_t face : parser->map_faces) {
       /* Extract each point in the edge */
       std::vector<uint16_t> points;
-      for (int i=0; i < face.num_edges; i++) {
+      for (int edge_index=face.first_edge; edge_index < face.first_edge + face.num_edges; edge_index++) {
           uint16_t edge1;
           uint16_t edge2;
 
-          bsp_surfedge_t surfedge = parser->map_surfedges[face.first_edge + i];
+          bsp_surfedge_t surfedge = parser->map_surfedges[edge_index];
           bsp_edge_t edge = parser->map_edges[abs(surfedge)];
           if (surfedge < 0) {
               edge1 = edge.v[0];
