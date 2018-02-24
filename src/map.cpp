@@ -27,6 +27,9 @@
 
 MapFace::MapFace(Shader* shader, std::vector<uint16_t>& indices) {
     this->shader = shader;
+    face_color = glm::vec3(float(rand()) / RAND_MAX,
+                           float(rand()) / RAND_MAX,
+                           float(rand()) / RAND_MAX);
 
     /* Create the vertex object array that'll store the mesh render info */
     glGenVertexArrays(1, &vao);
@@ -49,12 +52,9 @@ MapFace::MapFace(Shader* shader, std::vector<uint16_t>& indices) {
 }
 
 void MapFace::render() {
-    shader->SetVec3("face_color",
-                    float(rand()) / RAND_MAX,
-                    float(rand()) / RAND_MAX,
-                    float(rand()) / RAND_MAX);
+    shader->SetVec3("face_color", face_color);
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, index_amt, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLE_STRIP, index_amt, GL_UNSIGNED_SHORT, 0);
 }
 
 Map::Map() {

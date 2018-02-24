@@ -48,6 +48,7 @@ class MapFace {
     GLuint element_bo;
     size_t index_amt;
     Shader* shader;
+    glm::vec3 face_color;
 };
 
 
