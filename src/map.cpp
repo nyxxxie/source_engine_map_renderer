@@ -25,7 +25,9 @@
 #include "map.h"
 #include "bsp_parser.h"
 
-MapFace::MapFace(std::vector<uint16_t>& indices) {
+MapFace::MapFace(Shader* shader, std::vector<uint16_t>& indices) {
+    this->shader = shader;
+
     /* Create the vertex object array that'll store the mesh render info */
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -47,6 +49,10 @@ MapFace::MapFace(std::vector<uint16_t>& indices) {
 }
 
 void MapFace::render() {
+    shader->SetVec3("face_color",
+                    float(rand()) / RAND_MAX,
+                    float(rand()) / RAND_MAX,
+                    float(rand()) / RAND_MAX);
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, index_amt, GL_UNSIGNED_SHORT, 0);
 }
@@ -68,7 +74,7 @@ void Map::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4&
 }
 
 void Map::FromBSP(BSPParser* parser) {
-  shader = new Shader("./assets/shaders/point_cloud.glsl");
+  shader = new Shader("./assets/shaders/level.glsl");
 
   /* Create a buffer object to store vertex data in */
   glGenBuffers(1, &vertex_bo);
@@ -95,15 +101,11 @@ void Map::FromBSP(BSPParser* parser) {
           }
 
           /* Add the point indices to the array */
-          // TODO: if we have problems, we can just create a vbo for each face
-          //       instead of doing this complicated element crap.  More space
-          //       will be taken up in gpu memory, but we'll at least be able to
-          //       verify that the face system works as expected
           points.push_back(edge1);
           points.push_back(edge2);
       }
 
-      faces.push_back(MapFace(points));
+      faces.push_back(MapFace(shader, points));
   }
 
   /* Unbind the vertex buffer */

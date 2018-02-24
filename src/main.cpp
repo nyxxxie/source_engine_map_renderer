@@ -255,7 +255,7 @@ int main(int argc, char* argv[]) {
     }
 
     /* Draw in wireframe mode */
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     /* Start render loop! */
     printf("Rendering started.\n");

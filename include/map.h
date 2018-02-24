@@ -27,6 +27,7 @@
 #include <vector>
 #include <initializer_list>
 #include <glm/glm.hpp>
+#include "shader.h"
 #include "mesh.h"
 
 class BSPParser;
@@ -37,7 +38,7 @@ class BSPParser;
  */
 class MapFace {
   public:
-    MapFace(std::vector<uint16_t>& indices);
+    MapFace(Shader* shader, std::vector<uint16_t>& indices);
 
     void render();
 
@@ -46,6 +47,7 @@ class MapFace {
     GLuint vao;
     GLuint element_bo;
     size_t index_amt;
+    Shader* shader;
 };
 
 

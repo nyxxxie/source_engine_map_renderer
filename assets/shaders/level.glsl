@@ -17,9 +17,10 @@ void main() {
 #ifdef FRAGMENT_SHADER
 
 // Color that will be assigned to the fragment this shader is processing
+uniform vec3 face_color;
 out vec4 final_color;
 
 void main() {
-    final_color = vec4(1.0, 1.0, 1.0, 1.0);
+    final_color = vec4(face_color, 1.0);
 }
 #endif
