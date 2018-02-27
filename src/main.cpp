@@ -68,10 +68,10 @@ void key_callback(GLFWwindow* window, int key, int scode, int action, int mod) {
 	    draw_mode = (draw_mode + 1) % 3;
 	    switch(draw_mode) {
             case 0:
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 		break;
             case 1:
-                glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		break;
             case 2:
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
