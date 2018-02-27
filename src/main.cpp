@@ -46,6 +46,7 @@ float delta_time = 0.0f;
 float last_frame = 0.0f;
 float last_x = 0.0f;
 float last_y = 0.0f;
+int draw_mode = 0;
 
 
 /**
@@ -63,6 +64,20 @@ void key_callback(GLFWwindow* window, int key, int scode, int action, int mod) {
         if (key == GLFW_KEY_ESCAPE) {
             glfwSetWindowShouldClose(window, true);
         }
+        if (key == GLFW_KEY_F) {
+	    draw_mode = (draw_mode + 1) % 3;
+	    switch(draw_mode) {
+            case 0:
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		break;
+            case 1:
+                glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+		break;
+            case 2:
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		break;
+	    }
+	}
 
         bool sprint = bool(mod | GLFW_MOD_SHIFT);
     }
@@ -254,9 +269,6 @@ int main(int argc, char* argv[]) {
         map->FromBSP(&parser);
     }
 
-    /* Draw in wireframe mode */
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     /* Start render loop! */
     printf("Rendering started.\n");
     while (!glfwWindowShouldClose(window)) {
@@ -271,7 +283,7 @@ int main(int argc, char* argv[]) {
         process_input(window);
 
         /* Set the color the screen will clear to and then clear it */
-        glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //* Use shader and set basic shader options */
